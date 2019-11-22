@@ -1,4 +1,4 @@
-# MECHANICAL RIG TOOLKIT v.1.0 (Full-Version)
+# MECHANICAL RIG TOOLKIT v.1.0
 *Tim Coleman - tim.coleman.3d@gmail.com*
 
 Welcome to the Mechanical Rig Toolkit.  The top level "mechRig_toolkit" folder contains several sub-folders and script/tool files used in the Mechanical Rigging course.  This toolkit will be updated several times over the 8-week course to include scripts that are used at that point in the course.  The documentation below covers installation of the toolkit and its 3 core areas:  Utility Script Library, Custom Maya Shelf and the Custom Maya Marking Menu.
