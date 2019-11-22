@@ -36,7 +36,7 @@ def load_data(path=None):
 
 def save_data(path=None, data=None):
     '''Saves a dictionary as JSON in a file'''
-    if validatePath(path):
+    if validate_path(path):
         f = open(path, "w")
         f.write(json.dumps(data, sort_keys=1, indent=4, separators=(",", ":")))
         f.close()

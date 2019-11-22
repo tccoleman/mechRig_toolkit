@@ -84,7 +84,7 @@ def save_ctl_shape_to_lib(*args):
     if result == "Save":
         name = cmds.promptDialog(q=1, t=1)
         core.save_to_lib(cmds.ls(sl=1, fl=1)[0], name)
-    rebuild_UI()
+    #rebuild_UI()
 
 
 def copy_ctl_shape(*args):

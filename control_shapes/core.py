@@ -99,7 +99,7 @@ def save_to_lib(crv=None, shapeName=None):
     path = os.path.join(SHAPE_LIBRARY_PATH, re.sub("\s", "", shapeName) + ".json")
     for shapeDict in crvShape:
         shapeDict.pop("color", None)
-    utils.saveData(path, crvShape)
+    utils.save_data(path, crvShape)
 
 
 def set_color(crv, color):
