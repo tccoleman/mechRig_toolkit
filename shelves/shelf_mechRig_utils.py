@@ -261,7 +261,7 @@ class load(shelf_base._shelf):
 
         cmds.menuItem(p=week6_tools_menu, l="Duplicate (Parent Only)", command=lambda *args: cmds.duplicate(parentOnly=True))
         cmds.menuItem(p=week6_tools_menu, l="Snap first object(s) to last", command=lambda *args: week6.match_selection())
-        cmds.menuItem(p=week6_tools_menu, l="Create Pole Vector (select PV control then IK handle)", command="")
+        cmds.menuItem(p=week6_tools_menu, l="Create Pole Vector (select PV control then IK handle)", command=lambda *args: week6.create_pole_vector_from_selection())
         cmds.menuItem(p=week6_tools_menu, l="Create Category Switch (select rig top node)", command=lambda *args: week6.create_category_ui())
         cmds.menuItem(p=week6_tools_menu, l="Add offset and group transforms above selected control", command=lambda *args: week6.add_transforms_selected())
 
