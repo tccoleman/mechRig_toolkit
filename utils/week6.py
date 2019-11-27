@@ -201,14 +201,7 @@ def add_transforms(transform_list, search='_ctl', add_transforms=['_grp', '_off'
                 if i:
                     cmds.parent(add_tfm, created_tfms[i - 1])
             cmds.parent(tfm, created_tfms[-1])
+            #print ', '.join(created_tfms)
+            #print ', '.join(map(str, created_tfms))
             LOG.info('Added transforms {} to {}'.format(', '.join(map(str, created_tfms)), tfm))
 
-
-def connect_controls_to_overrideDisplayType(driver_node='rig', control_parent='rig', control_suffix='_ctl'):
-    """ Connects control shapes nodes to driver node's overrideDisplayType attribute """
-    node_list = cmds.listRelatives(control_parent, ad=True)
-    if node_list:
-        for node in node_list:
-            if control_suffix in node:
-                if 'nurbsCurve' in cmds.nodeType(node):
-                    cmds.connectAttr('{}.drawOverride.overrideDisplayType'.format(driver_node), '{}.drawOverride.overrideDisplayType'.format(node))
