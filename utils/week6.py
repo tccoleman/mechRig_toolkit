@@ -144,7 +144,7 @@ def create_category(top_node, category_name):
             cmds.setAttr('{}.secondTerm'.format(cond_node), 2)
             cmds.setAttr('{}.operation'.format(cond_node), 0)
             cmds.setAttr('{}.colorIfTrueR'.format(cond_node), 2)
-            cmds.setAttr('{}.colorIfTrueR'.format(cond_node), 0)
+            cmds.setAttr('{}.colorIfFalseR'.format(cond_node), 1)
 
             # Connect output of condition node to the display overrides of the category node
             cmds.connectAttr('{}.outColorR'.format(cond_node),
