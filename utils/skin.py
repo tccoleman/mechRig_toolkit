@@ -83,3 +83,16 @@ def rename_shape_deformed_nodes():
     else:
         LOG.error('Nothing selected, select geometry transforms and try again')
         return
+
+
+def return_skin_command():
+    """Returns skinCluster command to replicate selected objects skinning"""
+    selection = cmds.ls(selection=True)
+    if selection:
+        for item in selection:
+            sc = mel.eval('findRelatedSkinCluster("{}")'.format(item))
+            if sc:
+                infs = cmds.skinCluster(sc, q=True, inf=True)
+                str_infs = " ".join(infs)
+                sc_name = '{}_sc'.format(item)
+                print "cmds.skinCluster({}, '{}', n='{}', tsb=True)".format(str(infs), item, sc_name)
