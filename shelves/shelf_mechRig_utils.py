@@ -35,6 +35,9 @@ from mechRig_toolkit.utils import locator
 reload(locator)
 cmds.selectPref(trackSelectionOrder=True)
 
+from mechRig_toolkit.utils import utility
+reload(utility)
+
 from mechRig_toolkit.utils import week6
 reload(week6)
 
@@ -198,6 +201,9 @@ class load(shelf_base._shelf):
         self.addMenuItem(skin_tools_menu, "Rename Shape Deformed nodes on selected...",
                          command="from mechRig_toolkit.utils import skin; reload(skin); skin.rename_shape_deformed_nodes();")
 
+        self.addMenuItem(skin_tools_menu, "Print skinCluster command from selected...",
+                         command="from mechRig_toolkit.utils import skin; reload(skin); skin.return_skin_command();")
+
 
         # Anim Control Tools
         self.addButton(label="", icon=ICON_DIR + "/controlTools.png")
@@ -250,6 +256,14 @@ class load(shelf_base._shelf):
         cmds.menuItem(p=ctl_tools_menu, l="Flip Shape Y", command=lambda *args: ctl_trans.flip_shape_Y())
         cmds.menuItem(p=ctl_tools_menu, l="Flip Shape Z", command=lambda *args: ctl_trans.flip_shape_Z())
 
+
+        # Utilities
+        self.addButton(label="", icon=ICON_DIR + "/utils.png")
+        utils_menu = cmds.popupMenu(b=1)
+        cmds.menuItem(p=utils_menu, l="Lock All Channels on selected...",
+                      command=lambda *args: utility.lock_unlock_channels(lock=True))
+        cmds.menuItem(p=utils_menu, l="Unlock All Channels on selected...",
+                      command=lambda *args: utility.lock_unlock_channels(lock=False))
 
         # Separator
         self.addButton(label="", icon=ICON_DIR + "/sep.png", command='')
