@@ -3,8 +3,9 @@ joints.py
 
 Various functions for creating and editing joints and their axis.
 
-    from mechRig_toolkit.utils import joints
-    joints.orientTo()
+    from mechRig_toolkit.builds import Cambot_rig
+    reload(Cambot_rig)# Run this to pick up any changes made
+    Cambot_rig.build.run()
 
 """
 
@@ -158,3 +159,22 @@ def cross(a, b):
          a[0]*b[1] - a[1]*b[0]]
 
     return c
+
+
+def duplicate_joint_chain(source_joint, search='_jnt', replace='_ik'):
+    """Duplicates full skeleton chain from source_joint
+
+    duplicate_joint_chain('rt_frontShoulder_jnt', search='_jnt', replace='_ik')
+    """
+    dupe_chain = cmds.duplicate(source_joint, name=source_joint.replace(search, replace))
+    dupe_child = cmds.listRelatives(dupe_chain[0], ad=True, f=True)
+    dupe_child.sort(reverse=True)
+    for jnt in dupe_child:
+        cmds.rename(jnt, jnt.split('|')[-1].replace(search, replace))
+
+    # Re-list new joint chain to return cleaner list of the new joints
+    new_chain = cmds.listRelatives(dupe_chain[0], ad=True)
+    new_chain.sort(reverse=True)
+    new_chain.insert(0, dupe_chain[0])
+
+    return new_chain
