@@ -4,6 +4,52 @@ LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.DEBUG)
 from maya import cmds
 
+from mechRig_toolkit.utils import common
+reload(common)
+
+def create_pole_vector(pv_ctl, ik_handle):
+    """Positions pv_ctl and creates pole vector constraint for ik_handle to prevent any joint rotation
+
+    Arguments:
+        pv_ctl:    Transform to use as pole vector control
+
+        ik_handle: IK handle to add pole vector constrain to
+
+    Example:
+        create_pole_vector( 'locator2', 'ikHandle1' )
+    """
+    # Find the start joint from querying ik handle
+    start_joint = cmds.ikHandle(ik_handle, q=True, startJoint=True)
+    mid_joint = cmds.listRelatives(start_joint, children=True, type='joint')
+
+    # Constrain the pole vector control transform between start joint and ik_handle
+    cmds.delete(cmds.pointConstraint(start_joint, ik_handle, pv_ctl))
+
+    # Aim pole vector control to mid_joint - Aim X-axis
+    cmds.delete(cmds.aimConstraint(mid_joint[0], pv_ctl, aim=[1, 0, 0], u=[0, 0, 1], wut='none'))
+
+    # Find distance from pole vector control to mid_joint
+    pv_pos = cmds.xform(pv_ctl, q=True, ws=True, t=True)
+    mid_pos = cmds.xform(mid_joint[0], q=True, ws=True, t=True)
+    pv_dist = (pv_pos[0] - mid_pos[0], pv_pos[1] - mid_pos[1], pv_pos[2] - mid_pos[2])
+
+    # Add offset away from mid position
+    # - Moves pole vector to mid position PLUS original distance from initial position to mid position
+    pv_pos_off = (mid_pos[0] - pv_dist[0], mid_pos[1] - pv_dist[1], mid_pos[2] - pv_dist[2])
+    cmds.xform(pv_ctl, t=pv_pos_off)
+
+    # Add group node above pole vector control to zero it out
+    grp_name = '{}_grp'.format(pv_ctl)
+    if common.CTL in pv_ctl:
+        grp_name = pv_ctl.replace(common.CTL, common.GRP)
+    pv_grp = cmds.duplicate(pv_ctl, po=True, name=grp_name)[0]
+    cmds.parent(pv_ctl, pv_grp)
+
+    # Create pole vector constraint
+    cmds.poleVectorConstraint(pv_ctl, ik_handle)
+
+    return pv_pos_off
+
 
 def get_aim_axis(joint_name):
     """Returns the axis pointed down the chain as a string
@@ -120,8 +166,8 @@ def add_softIK(ik_handle, ik_ctl, base_name):
         neg_axis = False
         if '-' in aim_axis:
             neg_axis = True
-            aim_axis = aimAxis.replace('-', '')
-            aim_axis = aimAxis.capitalize()
+            aim_axis = aim_axis.replace('-', '')
+            aim_axis = aim_axis.capitalize()
 
         # Get abs ik mid and tip joints translate values to find that bones length
         mid_trans_axis_val = abs(cmds.getAttr('{}.translate{}'.format(ik_joints[1], aim_axis)))
@@ -234,11 +280,14 @@ def add_softIK(ik_handle, ik_ctl, base_name):
             cmds.disconnectAttr(ee_connected[0], '{}.translate{}'.format(end_effector, aim_axis))
 
         if neg_axis:
-            cmds.connectAttr('{}.output'.format(ee_adl), '{}.input1'.format(neg_mdn))
-            cmds.connectAttr('{}.output'.format(neg_mdn), '{}.translate{}'.format(end_effector, aim_axis))
+            neg_mdn = cmds.createNode('multiplyDivide', n='{}_neg_mdn'.format(base_name))
+            cmds.connectAttr('{}.output'.format(ee_adl), '{}.input1X'.format(neg_mdn))
+            cmds.setAttr('{}.input2X'.format(neg_mdn), -1)
+            cmds.connectAttr('{}.outputX'.format(neg_mdn), '{}.translate{}'.format(end_effector, aim_axis))
         else:
             cmds.connectAttr('{}.output'.format(ee_adl), '{}.translate{}'.format(end_effector, aim_axis))
 
+        cmds.parent(start_pos_tfm, end_pos_tfm, ik_ctl)
         cmds.select(ik_ctl)
         return ik_ctl
 
