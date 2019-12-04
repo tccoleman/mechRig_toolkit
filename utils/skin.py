@@ -12,6 +12,8 @@ logging.basicConfig()
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.INFO)
 
+import os.path
+
 from maya import cmds, mel
 
 def do_transfer_skin():
@@ -96,3 +98,61 @@ def return_skin_command():
                 str_infs = " ".join(infs)
                 sc_name = '{}_sc'.format(item)
                 print "cmds.skinCluster({}, '{}', n='{}', tsb=True)".format(str(infs), item, sc_name)
+
+
+def import_skin_weights_selected():
+    """Imports skin weights on selected meshes from Maya Project's "data" directory
+    using Maya's deformerWeights command.
+
+    Skin weights should be exported using the meshes name, for instance, the skin weight
+    file for the mesh "cn_head_mesh" should be exported as "cn_head_mesh.xml'
+
+    If a skin weight file is not found, the process is skipped without error
+    """
+    PROJ_PATH = cmds.workspace(query=True, rd=True)
+    DATA_PATH = PROJ_PATH + 'data/'
+
+    selection = cmds.ls(selection=True)
+    if selection:
+        for mesh in selection:
+            # Check if there's a skin cluster on mesh
+            sc = mel.eval('findRelatedSkinCluster("{}")'.format(mesh))
+            if sc:
+                # Check if the skin weight xml file exist
+                if os.path.exists(DATA_PATH+"{}.xml".format(mesh)):
+                    cmds.deformerWeights("{}.xml".format(mesh), im=True, method='index', deformer=sc, path=DATA_PATH)
+                    cmds.skinCluster(sc, edit=True, forceNormalizeWeights=True)
+                    LOG.info('Imported skin weight file {}'.format((DATA_PATH+"{}.xml".format(mesh))))
+                else:
+                    LOG.warning('No skin weight XML file found for {}'.format(mesh))
+            else:
+                LOG.warning('No skin cluster found on {}'.format(mesh))
+
+
+def export_skin_weights_selected():
+    """Exports skin weights on selected meshes to Maya Project's "data" directory
+    using Maya's deformerWeights command.
+
+    Skin weights are exported using the meshes name, for instance, the skin weight
+    file for the mesh "cn_head_mesh" would be exported as "cn_head_mesh.xml'
+
+    If a skin cluster is not found on a mesh, the process is skipped without error
+    """
+    PROJ_PATH = cmds.workspace(query=True, rd=True)
+    DATA_PATH = PROJ_PATH + 'data/'
+
+    selection = cmds.ls(selection=True)
+    if selection:
+        for mesh in selection:
+            # Check if there's a skin cluster on mesh
+            sc = mel.eval('findRelatedSkinCluster("{}")'.format(mesh))
+            if sc:
+                # Check if the skin weight xml file exist
+                if os.path.exists(DATA_PATH):
+                    cmds.deformerWeights("{}.xml".format(mesh), export=True, method='index', deformer=sc, path=DATA_PATH)
+                    LOG.info('Exported skin weight data to {}'.format((DATA_PATH+"{}.xml".format(mesh))))
+                else:
+                    LOG.warning('No data directory found under {} to save skin weight file to'.format(PROJ_PATH))
+            else:
+                LOG.warning('No skin cluster found on {}'.format(mesh))
+
