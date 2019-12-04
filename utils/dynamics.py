@@ -1,11 +1,11 @@
 """
 
-    jiggle.py
+    dynamics.py
 
     Utility for adding dynamic jiggle to controls of a rig.
 
-    from mechRig_toolkit import jiggle
-    jiggle.create_jiggle_locator('ball', 'my_jiggle')
+    from mechRig_toolkit.utils import dynamics
+    dynamics.create_jiggle_locator('ball', 'my_jiggle')
 
 """
 
@@ -38,7 +38,7 @@ def create_jiggle_locator(position_object, base_name):
         cmds.goal(part[0], goal=position_object, w=0.5, utr=True)
 
         # Create output transform
-        jiggle_output = cmds.spaceLocator(name="{}_output".format(base_name))[0]
+        jiggle_output = cmds.spaceLocator(name="{}_ctl".format(base_name))[0]
         cmds.connectAttr("{}.worldCentroid".format(part[1]), '{}.translate'.format(jiggle_output))
 
         # Create jiggle control
@@ -62,10 +62,11 @@ def create_jiggle_locator(position_object, base_name):
         cmds.connectAttr('{}.enabled'.format(jiggle_output), '{}.isDynamic'.format(part[1]))
 
         # Dynamics Weight
+        """
         cmds.addAttr(jiggle_output, ln="dynamicsWeight", at="double", min=0, max=1, dv=1)
         cmds.setAttr('{}.dynamicsWeight'.format(jiggle_output), k=True, l=False)
         cmds.connectAttr('{}.dynamicsWeight'.format(jiggle_output), '{}.dynamicsWeight'.format(part[1]))
-
+        """
         # Conserve
         cmds.addAttr(jiggle_output, ln="conserve", at="double", min=0, max=1, dv=1)
         cmds.setAttr('{}.conserve'.format(jiggle_output), k=True, l=False)
@@ -77,7 +78,7 @@ def create_jiggle_locator(position_object, base_name):
         cmds.connectAttr('{}.goalSmoothness'.format(jiggle_output), '{}.goalSmoothness'.format(part[1]))
 
         # Goal Weight
-        cmds.addAttr(jiggle_output, ln="goalWeight", at="double", min=0, dv=.5)
+        cmds.addAttr(jiggle_output, ln="goalWeight", at="double", min=0, max=1.0, dv=.5)
         cmds.setAttr('{}.goalWeight'.format(jiggle_output), k=True, l=False)
         cmds.connectAttr('{}.goalWeight'.format(jiggle_output), '{}.goalWeight[0]'.format(part[1]))
 
