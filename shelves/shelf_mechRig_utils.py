@@ -204,6 +204,14 @@ class load(shelf_base._shelf):
         self.addMenuItem(skin_tools_menu, "Print skinCluster command from selected...",
                          command="from mechRig_toolkit.utils import skin; reload(skin); skin.return_skin_command();")
 
+        self.addMenuItemDivider(skin_tools_menu, divider=True, dividerLabel='IMPORT/EXPORT...')
+
+        self.addMenuItem(skin_tools_menu, "Import skin weight file onto selected (if it exists)...",
+                         command="from mechRig_toolkit.utils import skin; reload(skin); skin.import_skin_weights_selected();")
+
+        self.addMenuItem(skin_tools_menu, "Export skin weight file from selected...",
+                         command="from mechRig_toolkit.utils import skin; reload(skin); skin.export_skin_weights_selected();")
+
 
         # Anim Control Tools
         self.addButton(label="", icon=ICON_DIR + "/controlTools.png")
