@@ -5,7 +5,7 @@ Welcome to the Mechanical Rig Toolkit.  The top level "mechRig_toolkit" folder c
 
 
 ##
-##Installation
+## Installation
 - Download the `mechRig_toolkit.zip` file and unzip it.  
 - Inside the `mechRig_toolkit` folder that was unzipped, there will be another `mechRig_toolkit` folder.  Copy and paste that folder into your `<USER>/Documents/maya/scripts/` directory.   
 - Launch Maya. 
