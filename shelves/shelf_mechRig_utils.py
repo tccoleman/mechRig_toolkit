@@ -223,7 +223,6 @@ class load(shelf_base._shelf):
         sub = cmds.menuItem(p=ctl_tools_menu, l="Assign Shape to selected...", subMenu=1)
 
         for each in ctl_func.get_available_control_shapes():
-            print each[0], each[1]
             self.addMenuItem(sub, each[0], command=each[1])
 
         cmds.menuItem(p=ctl_tools_menu, l="Open Shape directory...",
