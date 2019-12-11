@@ -78,12 +78,13 @@ def create_pole_vector(pv_ctl, ik_handle):
     # Find the start joint from querying ik handle
     start_joint = cmds.ikHandle(ik_handle, q=True, startJoint=True)
     mid_joint = cmds.listRelatives(start_joint, children=True, type='joint')
+    end_eff = cmds.ikHandle(ik_handle, q=True, endEffector=True)
 
     # Constrain the pole vector control transform between start joint and ik_handle
     cmds.delete(cmds.pointConstraint(start_joint, ik_handle, pv_ctl))
 
     # Aim pole vector control to mid_joint - Aim X-axis
-    cmds.delete(cmds.aimConstraint(mid_joint[0], pv_ctl, aim=[1, 0, 0], u=[0, 0, 1], wut='none'))
+    cmds.delete(cmds.aimConstraint(mid_joint[0], pv_ctl, aim=[1, 0, 0], u=[0, 0, 1], wut='object', wuo=end_eff))
 
     # Find distance from pole vector control to mid_joint
     pv_pos = cmds.xform(pv_ctl, q=True, ws=True, t=True)
