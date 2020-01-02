@@ -67,6 +67,59 @@ def selected_points():
         return
 
 
+def convert_joint_selection_to_loc():
+    """Used by 'center_selection()', bbox calculations don't work properly with joints, so this function converts joint
+    position to a locator
+    """
+    selection = cmds.ls(selection=True)
+    joint_list = list()
+    non_joint_list = list()
+    delete_list = list()
+
+    for item in selection:
+        if 'joint' in cmds.nodeType(item):
+            cmds.select(clear=True)
+            loc = cmds.spaceLocator(name=('{}_loc'.format(item)))[0]
+            cmds.delete(cmds.pointConstraint(item, loc))
+            selection.append(loc)
+            joint_list.append(item)
+            delete_list.append(loc)
+        else:
+            pass
+
+    non_joint_list = set(selection) - set(joint_list)
+    cmds.select(non_joint_list)
+
+    return non_joint_list, delete_list
+
+
+def center_selection():
+    """Creates locator at bounding box center of objects or components
+
+    Note:
+        Uses function "convert_joint_selection_to_loc()" to "convert" any selected joints to locators temporarily.
+    Joints don't work with bbox calculations accurately for this use
+
+    Tested with transforms, joints, vertices, edges
+    *Does not center locator on polygon "faces"
+    """
+    selection = cmds.ls(selection=True)
+    if selection:
+        filter_sel = convert_joint_selection_to_loc()
+        if filter_sel:
+            bbx = cmds.exactWorldBoundingBox(filter_sel[0])
+            centerX = (bbx[0] + bbx[3]) / 2.0
+            centerY = (bbx[1] + bbx[4]) / 2.0
+            centerZ = (bbx[2] + bbx[5]) / 2.0
+            bbox_center = [centerX, centerY, centerZ]
+            loc = cmds.spaceLocator()[0]
+            cmds.setAttr('{}.translate'.format(loc), *bbox_center)
+            if filter_sel[1]:
+                cmds.delete(filter_sel[1])
+            cmds.select(loc)
+            return loc
+
+
 def center_selection_manip():
     """Locator created at position of "Move" manipulator of selected"""
     sel = cmds.ls(selection=True)

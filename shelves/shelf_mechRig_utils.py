@@ -147,15 +147,10 @@ class load(shelf_base._shelf):
                                                                                            "reload(locator);"
                                                                                            "locator.create_locator_snap()")
 
-        self.addMenuItem(snap_tools_menu, "Locator at center (Manipulator Position)", command="from mechRig_toolkit.utils "
-                                                                                               "import locator;"
-                                                                                               "reload(locator);"
-                                                                                               "locator.center_selection_manip()")
-
-        self.addMenuItem(snap_tools_menu, "Locator at center (Weighted Average)", command="from mechRig_toolkit.utils "
-                                                                                           "import locator;"
-                                                                                           "reload(locator);"
-                                                                                           "locator.center_selection_weighted_average()")
+        self.addMenuItem(snap_tools_menu, "Locator at center of selected", command="from mechRig_toolkit.utils "
+                                                                                     "import locator;"
+                                                                                     "reload(locator);"
+                                                                                     "locator.center_selection()")
 
         self.addMenuItem(snap_tools_menu, "Locator aimed at selected", command="from mechRig_toolkit.utils "
                                                                                "import locator;"
