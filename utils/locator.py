@@ -73,7 +73,6 @@ def convert_joint_selection_to_loc():
     """
     selection = cmds.ls(selection=True)
     joint_list = list()
-    non_joint_list = list()
     delete_list = list()
 
     for item in selection:
@@ -87,7 +86,7 @@ def convert_joint_selection_to_loc():
         else:
             pass
 
-    non_joint_list = set(selection) - set(joint_list)
+    non_joint_list = list(set(selection) - set(joint_list))
     cmds.select(non_joint_list)
 
     return non_joint_list, delete_list
