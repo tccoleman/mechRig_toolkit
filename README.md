@@ -6,6 +6,15 @@ Welcome to the Mechanical Rig Toolkit.  The top level "mechRig_toolkit" folder c
 
 ##
 ## Installation
+Use one of two ways to download the mechRig_toolkit from GitHub
+##### 1) Using GitHub Desktop
+- Download and install GitHub Desktop from https://desktop.github.com/
+- Launch GitHub Desktop and click on “Clone a Repository from the Internet”
+- Click on "URL" tab, put in https://github.com/tccoleman/mechRig_toolkit as URL
+- Choose your "maya/scripts" directory and the local path
+- Click the "Clone" button which will download the toolkit into your maya script directory
+
+##### 2) Downloading zip file from GitHub
 - Download the `mechRig_toolkit.zip` file and unzip it.  
 - Inside the `mechRig_toolkit` folder that was unzipped, there will be another `mechRig_toolkit` folder.  Copy and paste that folder into your `<USER>/Documents/maya/scripts/` directory.   
 - Launch Maya. 
