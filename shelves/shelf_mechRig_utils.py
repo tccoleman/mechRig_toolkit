@@ -267,6 +267,9 @@ class load(shelf_base._shelf):
         cmds.menuItem(p=utils_menu, l="Unlock All Channels on selected...",
                       command=lambda *args: utility.lock_unlock_channels(lock=False))
 
+        cmds.menuItem(p=utils_menu, l="Fix control shape reference display...",
+                      command=lambda *args: utility.connect_controls_to_overrideDisplayType())
+
         # Separator
         self.addButton(label="", icon=ICON_DIR + "/sep.png", command='')
 

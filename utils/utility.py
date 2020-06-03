@@ -85,3 +85,31 @@ def create_category(top_node, category_name):
     else:
         LOG.error('{} does not exist'.format(top_node))
         return
+
+
+"""
+* Because the anim control curve shapes have "override enabled", it causes an issue with our "rig" vis switch.
+The vis switch controls the overrideDisplayType of the "rig" node.  However, since each control curve shape in 
+the rig has "overrideEnabled" turned on, it overrides what the overrideDisplay type occuring on the "rig" node.
+
+To fix this, we need to connect the output of the vis switch's rig attr to the overrideDisplayType of each anim
+control curve.
+"""
+
+def connect_controls_to_overrideDisplayType(driver_node='rig', control_parent='rig', control_suffix='_ctl'):
+    """ Connects control shapes nodes to driver node's overrideDisplayType attribute
+
+        Example:
+            connect_controls_to_overrideDisplayType()
+    """
+    node_list = cmds.listRelatives(control_parent, ad=True)
+    if node_list:
+        for node in node_list:
+            if control_suffix in node:
+                if 'nurbsCurve' in cmds.nodeType(node):
+                    try:
+                        cmds.connectAttr('{}.drawOverride.overrideDisplayType'.format(driver_node),
+                                         '{}.drawOverride.overrideDisplayType'.format(node))
+                        LOG.info('Fixed control curve override display on {}'.format(node))
+                    except:
+                        pass
