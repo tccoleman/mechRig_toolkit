@@ -1,6 +1,6 @@
 """
 
-    CamBot Scripted Rig Build - Tim Coleman, CGMA Mechanical Rigging Winter 2019
+    CamBot Scripted Rig Build - Tim Coleman, CGMA Mechanical Rigging
 
         This is an example of a scripted rig build in Maya.  The "build_rig" function here is called
         which runs a series of functions in a particular order to create different parts of the rig,
@@ -11,15 +11,17 @@
 
     To Run the Cambot Scripted Rig Build:
 
-    1)  Set your Maya project to a project that has the "CamBot_build_v1.ma", this is what's used in the build file.
+    1)  Download and Unzip the "Cambot.zip" file located in this same folder this script is in.
 
-    2)  Copy and paste the following into your Maya Script Editor
+    2)  Set your Maya project to the downloaded/unzipped "Cambot" Maya project.  Make sure there is a "CamBot_build_v1.ma"
+        in the scenes folder of this project.  The model and textures are not provided with this Maya project, so you will
+        have to copy your latest Cambot model and textures into the models and textures directories in this Cambot
+        Maya project.
+
+    3)  Copy and paste the following into your Maya Script Editor (no need to have any files open beforehand):
+
         from mechRig_toolkit.builds import Cambot_rig
-        reload(Cambot_rig)
         Cambot_rig.build.run()
-
-    * Note:  I have not included the skin weights files that need to reside in the "data" directory of your Maya
-             project.  You will have to generate and save those before running the build.
 
 """
 import logging
