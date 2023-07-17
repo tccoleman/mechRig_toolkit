@@ -1,6 +1,6 @@
 import logging
 
-LOG = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 def run_test():
@@ -10,5 +10,5 @@ def run_test():
         import mechRig_toolkit
         mechRig_toolkit.run_test()
     """
-    LOG.info("Mech Rig Toolkit installed successfully")
+    log.info("Mech Rig Toolkit installed successfully")
     return True

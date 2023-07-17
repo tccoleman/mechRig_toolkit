@@ -56,13 +56,12 @@ def explore_maya_project():
 def reload_shelf(shelf_name=SHELF_NAME):
     """Reloads shelf"""
     try:
+        from imp import reload
+        from mechRig_toolkit.shelves import shelf_mechRig_utils
         import shelf_base
 
-        reload(shelf_base)
-
-        from mechRig_toolkit.shelves import shelf_mechRig_utils
-
         reload(shelf_mechRig_utils)
+        reload(shelf_base)
 
         shelf_mechRig_utils.load(name=shelf_name)
         log.info("Successfully reloaded {} shelf".format(SHELF_NAME))
@@ -75,7 +74,6 @@ def reload_shelf(shelf_name=SHELF_NAME):
 def setup_mech_rig_marking_menu():
     from mechRig_toolkit.marking_menu import mechRig_marking_menu
 
-    reload(mechRig_marking_menu)
     mechRig_marking_menu.MarkingMenu()
 
     log.info("Setup Mech Rig Marking Menu")

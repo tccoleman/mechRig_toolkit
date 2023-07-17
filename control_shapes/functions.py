@@ -15,7 +15,7 @@ from maya import cmds
 
 from mechRig_toolkit.control_shapes import core
 
-LOG = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 def get_available_control_shapes():
@@ -72,10 +72,10 @@ def assign_control_shape(*args):
                 cmds.rename(circle_temp_shp, "{}Shape".format(each))
                 cmds.delete(circle_temp)
                 core.set_shape(each, core.load_from_lib(args[0]))
-            LOG.info("Created control shape {} on {}".format(args[0], each))
+            log.info("Created control shape {} on {}".format(args[0], each))
         cmds.select(sel)
     else:
-        LOG.info("Nothing selected, creating control shape {}".format(args[0]))
+        log.info("Nothing selected, creating control shape {}".format(args[0]))
         circle_temp = cmds.circle(
             name=args[0],
             c=[0, 0, 0],
@@ -123,7 +123,7 @@ def copy_ctl_shape(*args):
     ctl_color_clipboard = core.get_color(cmds.ls(sl=1, fl=1)[0])
     for ctlShape in ctl_shape_clipboard:
         ctlShape.pop("color")
-    LOG.info("Copied curve shape from {}".format(ctlShape))
+    log.info("Copied curve shape from {}".format(ctlShape))
 
 
 def paste_ctl_shape(*args):
@@ -137,7 +137,7 @@ def paste_ctl_shape(*args):
         core.set_shape(each, ctl_shape_clipboard)
         core.set_color(each, ctl_color_clipboard)
     cmds.select(sel)
-    LOG.info("Pasted curve shape to {}".format(ctl))
+    log.info("Pasted curve shape to {}".format(ctl))
 
 
 def delete_shapes():

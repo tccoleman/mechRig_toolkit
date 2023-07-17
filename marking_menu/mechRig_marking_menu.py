@@ -7,7 +7,6 @@ http://bindpose.com/custom-marking-menu-maya-python/
 
 
 from mechRig_toolkit.marking_menu import mechRig_marking_menu
-reload(mechRig_marking_menu)
 mechRig_marking_menu.markingMenu()
 
 

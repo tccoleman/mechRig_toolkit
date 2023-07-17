@@ -1,7 +1,6 @@
 import logging
 
 from maya import cmds
-import pymel.core as pm
 
 from mechRig_toolkit.control_shapes import core
 
@@ -129,12 +128,12 @@ def rotate_shape(rotation):
     Returns:
         None
     """
-    for node in pm.selected():
+    for node in cmds.ls(selection=True):
         for shape in node.getShapes():
-            if isinstance(shape, pm.nt.Mesh):
-                pm.rotate(shape.vtx, rotation, os=1)
-            elif isinstance(shape, pm.nt.NurbsCurve):
-                pm.rotate(shape.cv, rotation, os=1)
+            if cmds.nodeType(shape) == "mesh":
+                cmds.rotate(shape.vtx, rotation, os=1)
+            elif cmds.nodeType(shape) == "nurbsCurve":
+                cmds.rotate(shape.cv, rotation, os=1)
 
 
 def scale_shape(node, scaleVector):
