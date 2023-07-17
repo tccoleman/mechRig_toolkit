@@ -17,17 +17,17 @@ Various functions for creating locators at positions in a variety of ways.
 """
 import logging
 
-logging.basicConfig()
-LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.INFO)
-
 from maya import cmds
+
+logging.basicConfig()
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
 
 def enable_track_selections():
     # Enable trackSelectionOrder to get proper selection order for aim_selection()
-	if not cmds.selectPref(trackSelectionOrder=True):
-		cmds.selectPref(trackSelectionOrder=True)
-		LOG.info('Track selection order enabled')
+    if not cmds.selectPref(trackSelectionOrder=True):
+        cmds.selectPref(trackSelectionOrder=True)
+        log.info("Track selection order enabled")
 
 
 def selected_points():
@@ -36,34 +36,32 @@ def selected_points():
 
     # If there is a valid selection
     if sel:
-
         # Loop through the selected nodes
         for i in range(0, len(sel)):
-
             # We'll store the position data returned by the xform command in the "pos" variable
             pos = list()
 
             # Check if node is a transform/joint OR a component vertex/CV
             # If a transform, we'll use the "piv" flag in the xform command for accuracy
-            if 'transform' in cmds.nodeType(sel[i]) or 'joint' in cmds.nodeType(sel[i]):
-                LOG.info('{} is a transform/joint'.format(sel[i]))
+            if "transform" in cmds.nodeType(sel[i]) or "joint" in cmds.nodeType(sel[i]):
+                log.info("{} is a transform/joint".format(sel[i]))
                 pos = cmds.xform(sel[i], query=True, worldSpace=True, piv=True)
 
             # Otherwise, we'll use the "translation" flag for all else, including components
             else:
-                LOG.info('{} is a component'.format(sel[i]))
+                log.info("{} is a component".format(sel[i]))
                 pos = cmds.xform(sel[i], query=True, worldSpace=True, translation=True)
 
             # Create a locator and move it to the node's position we just obtained
             loc = cmds.spaceLocator(p=[0, 0, 0])
-            cmds.setAttr(loc[0] + '.translate', pos[0], pos[1], pos[2])
-            
-        LOG.info('Created locators at selected positions.')
+            cmds.setAttr(loc[0] + ".translate", pos[0], pos[1], pos[2])
+
+        log.info("Created locators at selected positions.")
         return True
 
     # If nothing is selected, let the user know
     else:
-        LOG.error('Nothing selected!')
+        log.error("Nothing selected!")
         return
 
 
@@ -76,9 +74,9 @@ def convert_joint_selection_to_loc():
     delete_list = list()
 
     for item in selection:
-        if 'joint' in cmds.nodeType(item):
+        if "joint" in cmds.nodeType(item):
             cmds.select(clear=True)
-            loc = cmds.spaceLocator(name=('{}_loc'.format(item)))[0]
+            loc = cmds.spaceLocator(name=("{}_loc".format(item)))[0]
             cmds.delete(cmds.pointConstraint(item, loc))
             selection.append(loc)
             joint_list.append(item)
@@ -112,7 +110,7 @@ def center_selection():
             centerZ = (bbx[2] + bbx[5]) / 2.0
             bbox_center = [centerX, centerY, centerZ]
             loc = cmds.spaceLocator()[0]
-            cmds.setAttr('{}.translate'.format(loc), *bbox_center)
+            cmds.setAttr("{}.translate".format(loc), *bbox_center)
             if filter_sel[1]:
                 cmds.delete(filter_sel[1])
             cmds.select(loc)
@@ -124,17 +122,17 @@ def center_selection_manip():
     sel = cmds.ls(selection=True)
 
     if sel:
-        cmds.setToolTo('Move')
-        cntr_pos = cmds.manipMoveContext('Move', q=True, p=True)
+        cmds.setToolTo("Move")
+        cntr_pos = cmds.manipMoveContext("Move", q=True, p=True)
 
         loc = cmds.spaceLocator(p=[0, 0, 0])
-        cmds.setAttr(loc[0] + '.translate', cntr_pos[0], cntr_pos[1], cntr_pos[2])
+        cmds.setAttr(loc[0] + ".translate", cntr_pos[0], cntr_pos[1], cntr_pos[2])
 
-        LOG.info('Created locators at manipulator center of selected positions.')
+        log.info("Created locators at manipulator center of selected positions.")
         return loc[0]
 
     else:
-        LOG.error('Nothing selected!')
+        log.error("Nothing selected!")
 
 
 def center_selection_weighted_average():
@@ -149,13 +147,13 @@ def center_selection_weighted_average():
         for i in range(0, len(sel)):
             # Check if node is a transform/joint OR a component vertex/CV
             # If a transform, we'll use the "piv" flag in the xform command for accuracy
-            if 'transform' in cmds.nodeType(sel[i]) or 'joint' in cmds.nodeType(sel[i]):
-                LOG.info('{} is a transform/joint'.format(sel[i]))
+            if "transform" in cmds.nodeType(sel[i]) or "joint" in cmds.nodeType(sel[i]):
+                log.info("{} is a transform/joint".format(sel[i]))
                 pos = cmds.xform(sel[i], query=True, worldSpace=True, piv=True)
 
             # Otherwise, we'll use the "translation" flag for all else, including components
             else:
-                LOG.info('{} is a component'.format(sel[i]))
+                log.info("{} is a component".format(sel[i]))
                 pos = cmds.xform(sel[i], query=True, worldSpace=True, translation=True)
 
             cntr_pos[0] = pos[0] + cntr_pos[0]
@@ -169,25 +167,26 @@ def center_selection_weighted_average():
 
         # Create a locator and set it's position to the final cntr_pos value
         loc = cmds.spaceLocator(p=[0, 0, 0])
-        cmds.setAttr(loc[0] + '.translate', cntr_pos[0], cntr_pos[1], cntr_pos[2])
+        cmds.setAttr(loc[0] + ".translate", cntr_pos[0], cntr_pos[1], cntr_pos[2])
 
-        LOG.info('Created locators at selected positions.')
+        log.info("Created locators at selected positions.")
         return loc[0]
 
     else:
-        LOG.error('Nothing selected!')
+        log.error("Nothing selected!")
 
 
-def aim_selection(aim_vec=[1,0,0], up_vec=[0,1,0]):
+def aim_selection(aim_vec=[1, 0, 0], up_vec=[0, 1, 0]):
     """Takes 3 points, position, aim and up and creates positioned/oriented locator"""
 
     # Make sure we're getting our list of items in the correct order here, pos, aim, up
-    sel = cmds.ls(selection=True, flatten=True)# BUG - for some reason, need to run this first?
+    sel = cmds.ls(
+        selection=True, flatten=True
+    )  # BUG - for some reason, need to run this first?
     sel = cmds.ls(orderedSelection=True, flatten=True)
 
     # If we have 3 selected points/objects let's continue
     if len(sel) == 3:
-
         # Get the positions of each vector
         pos = cmds.xform(sel[0], query=True, ws=True, translation=True)
         aim = cmds.xform(sel[1], query=True, ws=True, translation=True)
@@ -195,26 +194,35 @@ def aim_selection(aim_vec=[1,0,0], up_vec=[0,1,0]):
 
         # Create a locator and move it to the position
         pos_loc = cmds.spaceLocator(p=[0, 0, 0])
-        cmds.setAttr(pos_loc[0] + '.translate', pos[0], pos[1], pos[2])
+        cmds.setAttr(pos_loc[0] + ".translate", pos[0], pos[1], pos[2])
 
         # Create a temp AIM locator and move it to the aim position
-        aim_loc = cmds.spaceLocator(p=[0, 0, 0], name='aimTEMP')
-        cmds.setAttr(aim_loc[0] + '.translate', aim[0], aim[1], aim[2])
+        aim_loc = cmds.spaceLocator(p=[0, 0, 0], name="aimTEMP")
+        cmds.setAttr(aim_loc[0] + ".translate", aim[0], aim[1], aim[2])
 
         # Create a temp UP locator and move it to the up position
-        up_loc = cmds.spaceLocator(p=[0, 0, 0], name='upTEMP')
-        cmds.setAttr(up_loc[0] + '.translate', up[0], up[1], up[2])
+        up_loc = cmds.spaceLocator(p=[0, 0, 0], name="upTEMP")
+        cmds.setAttr(up_loc[0] + ".translate", up[0], up[1], up[2])
 
         # Aim constrain pos_loc to aim_loc while using our up position as up vector
-        cmds.aimConstraint(aim_loc, pos_loc, aimVector=aim_vec, upVector=up_vec, worldUpType='object', worldUpObject=up_loc[0], worldUpVector=[up[0], up[1], up[2]])
+        cmds.aimConstraint(
+            aim_loc,
+            pos_loc,
+            aimVector=aim_vec,
+            upVector=up_vec,
+            worldUpType="object",
+            worldUpObject=up_loc[0],
+            worldUpVector=[up[0], up[1], up[2]],
+        )
 
         cmds.delete(aim_loc, up_loc)
-        cmds.setAttr('{}.displayLocalAxis'.format(pos_loc[0]), 1)
+        cmds.setAttr("{}.displayLocalAxis".format(pos_loc[0]), 1)
         cmds.select(sel, pos_loc[0])
 
     else:
-        LOG.error('Please select 3 points/objects (position, aim and up)')
+        log.error("Please select 3 points/objects (position, aim and up)")
         return
+
 
 def create_locator_snap():
     """Creates new locator and snaps to selected"""
@@ -225,8 +233,9 @@ def create_locator_snap():
         cmds.select(loc[0], item)
         snap_object()
         created_locs.append(loc[0])
-        LOG.info('Created {} and snapped to {}'.format(loc[0], item))
+        log.info("Created {} and snapped to {}".format(loc[0], item))
     cmds.select(created_locs)
+
 
 def snap_object():
     """Snaps first selected objects to last selected object"""
@@ -237,4 +246,4 @@ def snap_object():
         for item in selection[:-1]:
             cmds.xform(item, ws=True, t=pos)
             cmds.xform(item, ws=True, ro=rot)
-            LOG.info('Snapped {} to {}'.format(item, selection[-1]))
+            log.info("Snapped {} to {}".format(item, selection[-1]))

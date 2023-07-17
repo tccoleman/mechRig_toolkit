@@ -7,14 +7,13 @@ Various skinning functions.
 
 """
 import logging
-
-logging.basicConfig()
-LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.INFO)
-
-import os.path
+import os
 
 from maya import cmds, mel
+
+logging.basicConfig()
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
 
 def do_transfer_skin():
     """Transfer skin of first selected object to second selected object"""
@@ -24,7 +23,7 @@ def do_transfer_skin():
     if len(selection) == 2:
         transfer_skin(selection[0], selection[1])
     else:
-        LOG.error('Please select source and target object to transfer skin')
+        log.error('Please select source and target object to transfer skin')
         return
 
 
@@ -43,10 +42,10 @@ def transfer_skin(source, target):
         tgt_skin = cmds.skinCluster(src_infs, tgt_geom, name=tgt_geom + '_skinCluster', toSelectedBones=True)[0]
         cmds.copySkinWeights(sourceSkin=src_skin, destinationSkin=tgt_skin, surfaceAssociation='closestPoint', influenceAssociation='oneToOne', noMirror=True, smooth=False)
 
-        LOG.info('Successfully transferred skinning from {} to {}'.format(source, target))
+        log.info('Successfully transferred skinning from {} to {}'.format(source, target))
 
     else:
-        LOG.error('No skinCluster found on {}'.format(source))
+        log.error('No skinCluster found on {}'.format(source))
         return
 
 
@@ -74,16 +73,16 @@ def rename_shape_deformed_nodes():
                 for geo_shp in geo_shps:
                     if geo_shp.endswith('Shape'):
                         cmds.rename(geo_shp, '{}Orig'.format(geo_shp))
-                        LOG.info('Renamed {} to {}'.format(geo_shp, '{}Orig'.format(geo_shp)))
+                        log.info('Renamed {} to {}'.format(geo_shp, '{}Orig'.format(geo_shp)))
 
                 # Pass 2 - rename ShapeDeformed node to Shape
                 for geo_shp in geo_shps:
                     if geo_shp.endswith('ShapeDeformed'):
                         cmds.rename(geo_shp, geo_shp.replace('Deformed', ''))
-                        LOG.info('Renamed {} to {}'.format(geo_shp, geo_shp.replace('Deformed', '')))
+                        log.info('Renamed {} to {}'.format(geo_shp, geo_shp.replace('Deformed', '')))
 
     else:
-        LOG.error('Nothing selected, select geometry transforms and try again')
+        log.error('Nothing selected, select geometry transforms and try again')
         return
 
 
@@ -97,7 +96,7 @@ def return_skin_command():
                 infs = cmds.skinCluster(sc, q=True, inf=True)
                 str_infs = " ".join(infs)
                 sc_name = '{}_sc'.format(item)
-                print "cmds.skinCluster({}, '{}', n='{}', tsb=True)".format(str(infs), item, sc_name)
+                log.info("cmds.skinCluster({}, '{}', n='{}', tsb=True)".format(str(infs), item, sc_name))
 
 
 def import_skin_weights_selected():
@@ -122,11 +121,11 @@ def import_skin_weights_selected():
                 if os.path.exists(DATA_PATH+"{}.xml".format(mesh)):
                     cmds.deformerWeights("{}.xml".format(mesh), im=True, method='index', deformer=sc, path=DATA_PATH)
                     cmds.skinCluster(sc, edit=True, forceNormalizeWeights=True)
-                    LOG.info('Imported skin weight file {}'.format((DATA_PATH+"{}.xml".format(mesh))))
+                    log.info('Imported skin weight file {}'.format((DATA_PATH + "{}.xml".format(mesh))))
                 else:
-                    LOG.warning('No skin weight XML file found for {}'.format(mesh))
+                    log.warning('No skin weight XML file found for {}'.format(mesh))
             else:
-                LOG.warning('No skin cluster found on {}'.format(mesh))
+                log.warning('No skin cluster found on {}'.format(mesh))
 
 
 def export_skin_weights_selected():
@@ -150,9 +149,9 @@ def export_skin_weights_selected():
                 # Check if the skin weight xml file exist
                 if os.path.exists(DATA_PATH):
                     cmds.deformerWeights("{}.xml".format(mesh), export=True, method='index', deformer=sc, path=DATA_PATH)
-                    LOG.info('Exported skin weight data to {}'.format((DATA_PATH+"{}.xml".format(mesh))))
+                    log.info('Exported skin weight data to {}'.format((DATA_PATH + "{}.xml".format(mesh))))
                 else:
-                    LOG.warning('No data directory found under {} to save skin weight file to'.format(PROJ_PATH))
+                    log.warning('No data directory found under {} to save skin weight file to'.format(PROJ_PATH))
             else:
-                LOG.warning('No skin cluster found on {}'.format(mesh))
+                log.warning('No skin cluster found on {}'.format(mesh))
 

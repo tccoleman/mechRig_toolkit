@@ -1,17 +1,14 @@
 import logging
-LOG = logging.getLogger(__name__)
-
-import functools
-import os
-
-import core
-reload(core)
 
 from maya import cmds
 import pymel.core as pm
 
+from mechRig_toolkit.control_shapes import core
+
+log = logging.getLogger(__name__)
+
 def mirror_ctl_shapes(*args):
-    '''Mirrors the selected control's shape to the other control on the other side'''
+    """Mirrors the selected control's shape to the other control on the other side"""
     sel = cmds.ls(sl=1, fl=1)
     for ctl in sel:
         search = "lf_"
@@ -25,11 +22,13 @@ def mirror_ctl_shapes(*args):
         flip_shape(ctl.replace(search, replace))
         core.set_color(ctl.replace(search, replace), color_val)
     cmds.select(sel)
-    LOG.info('Mirrored control shape {} to {}'.format(ctl, ctl.replace(search, replace)))
+    log.info(
+        "Mirrored control shape {} to {}".format(ctl, ctl.replace(search, replace))
+    )
 
 
 def flip_shape_callback(*args):
-    '''Flips the selected control shapes to the other side in all axis'''
+    """Flips the selected control shapes to the other side in all axis"""
     sel = cmds.ls(sl=1, fl=1)
     for each in sel:
         flip_shape(each)
@@ -37,7 +36,7 @@ def flip_shape_callback(*args):
 
 
 def flip_shape_X(*args):
-    '''Flips the selected control shapes to the other side in X'''
+    """Flips the selected control shapes to the other side in X"""
     sel = cmds.ls(sl=1, fl=1)
     for each in sel:
         flip_shape(each, [-1, 1, 1])
@@ -45,7 +44,7 @@ def flip_shape_X(*args):
 
 
 def flip_shape_Y(*args):
-    '''Flips the selected control shapes to the other side in Y'''
+    """Flips the selected control shapes to the other side in Y"""
     sel = cmds.ls(sl=1, fl=1)
     for each in sel:
         flip_shape(each, [1, -1, 1])
@@ -53,7 +52,7 @@ def flip_shape_Y(*args):
 
 
 def flip_shape_Z(*args):
-    '''Flips the selected control shapes to the other side in Z'''
+    """Flips the selected control shapes to the other side in Z"""
     sel = cmds.ls(sl=1, fl=1)
     for each in sel:
         flip_shape(each, [1, 1, -1])
@@ -61,13 +60,17 @@ def flip_shape_Z(*args):
 
 
 def flip_shape(crv=None, axis=[-1, -1, -1]):
-    '''Scales the points of the crv argument by the axis argument. This function is not meant to be
-    called directly. Look at the flipCtlShape instead.'''
+    """Scales the points of the crv argument by the axis argument. This function is not meant to be
+    called directly. Look at the flipCtlShape instead."""
     shapes = core.get_shape(crv)
     newShapes = []
     for shape in shapes:
         for i, each in enumerate(shape["points"]):
-            shape["points"][i] = [each[0] * axis[0], each[1] * axis[1], each[2] * axis[2]]
+            shape["points"][i] = [
+                each[0] * axis[0],
+                each[1] * axis[1],
+                each[2] * axis[2],
+            ]
         newShapes.append(shape)
     core.set_shape(crv, newShapes)
     cmds.select(crv)
@@ -88,13 +91,17 @@ def return_shapes(node, intermediate=False):
         The name of the shape node.
     """
     returnShapes = []
-    if cmds.nodeType(node) == 'transform' or 'joint':
+    if cmds.nodeType(node) == "transform" or "joint":
         shapes = cmds.listRelatives(node, shapes=True, path=True)
         if not shapes:
             shapes = []
         for shape in shapes:
-            is_intermediate = cmds.getAttr('%s.intermediateObject' % shape)
-            if intermediate and is_intermediate and cmds.listConnections(shape, source=False):
+            is_intermediate = cmds.getAttr("%s.intermediateObject" % shape)
+            if (
+                intermediate
+                and is_intermediate
+                and cmds.listConnections(shape, source=False)
+            ):
                 returnShapes.append(shape)
                 # return shape
             elif not intermediate and not is_intermediate:
@@ -103,8 +110,8 @@ def return_shapes(node, intermediate=False):
         return returnShapes
         if shapes:
             return shapes[0]
-    elif cmds.nodeType(node) in ['mesh', 'nurbsCurve', 'nurbsSurface']:
-        is_intermediate = cmds.getAttr('%s.intermediateObject' % node)
+    elif cmds.nodeType(node) in ["mesh", "nurbsCurve", "nurbsSurface"]:
+        is_intermediate = cmds.getAttr("%s.intermediateObject" % node)
         if is_intermediate and not intermediate:
             node = cmds.listRelatives(node, parent=True, path=True)[0]
             return get_shape(node)
@@ -145,19 +152,22 @@ def scale_shape(node, scaleVector):
         Logs warning if scaleVector is not a list of three.
     """
     if not cmds.objExists(node):
-        LOG.warning(node + ' does not exist.')
+        log.warning(node + " does not exist.")
         return
-    elif not (cmds.objectType(node, isType='transform') or cmds.objectType(node, isType='joint')):
-        LOG.warning('Input node requires transform or joint type.')
+    elif not (
+        cmds.objectType(node, isType="transform")
+        or cmds.objectType(node, isType="joint")
+    ):
+        log.warning("Input node requires transform or joint type.")
         return
     elif len(scaleVector) != 3:
-        LOG.warning('Input scaleVector requires a list of three.')
+        log.warning("Input scaleVector requires a list of three.")
         return
 
     shapeList = return_shapes(node)
     for shape in shapeList:
         cmds.select(cl=1)
-        cmds.select(shape + '.cv[:]')
+        cmds.select(shape + ".cv[:]")
         cmds.scale(scaleVector[0], scaleVector[1], scaleVector[2], r=1, ocp=0)
     cmds.select(node)
 
@@ -166,15 +176,15 @@ def scale_up_selected(scaleValue=1.1):
     sel = cmds.ls(selection=True)
     if sel:
         for ctl in sel:
-            scale_shape(ctl, [scaleValue,scaleValue,scaleValue])
+            scale_shape(ctl, [scaleValue, scaleValue, scaleValue])
         cmds.select(sel)
         return True
 
 
-def scale_down_selected(scaleValue=.9):
+def scale_down_selected(scaleValue=0.9):
     sel = cmds.ls(selection=True)
     if sel:
         for ctl in sel:
-            scale_shape(ctl, [scaleValue,scaleValue,scaleValue])
+            scale_shape(ctl, [scaleValue, scaleValue, scaleValue])
         cmds.select(sel)
         return True

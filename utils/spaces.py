@@ -9,11 +9,11 @@
 """
 import logging
 
-logging.basicConfig()
-LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.INFO)
-
 from maya import cmds
+
+logging.basicConfig()
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
 
 '''
 def get_parent_constraint(space_constraint_node):
@@ -79,7 +79,7 @@ def attach(source, target):
     space_offset = get_message_attribute_connections(source, attrName="space_offset")
 
     if not space_constrain:
-        LOG.error('There are no space transforms setup on {}'.format(source))
+        log.error('There are no space transforms setup on {}'.format(source))
         return
 
     # Determine if there's an existing parent constrain on space_constrain node
@@ -95,15 +95,15 @@ def attach(source, target):
 
     # If there's an existing parent constraint
     if par_cons:
-        LOG.info('Parent constraint exists')
+        log.info('Parent constraint exists')
         par_con = par_cons[0]
         # if the target is already active exit
         if target == get_active_constraint_target(par_con):
-            LOG.error('{} is already active target for {}'.format(target, source))
+            log.error('{} is already active target for {}'.format(target, source))
             return
 
         target_list = cmds.parentConstraint(par_con, q=True, tl=True)
-        print target_list
+        log.info(target_list)
 
         # reset all targets
         for i in range(len(target_list)):
@@ -122,7 +122,7 @@ def attach(source, target):
         target_id = cmds.parentConstraint(par_con, q=True, tl=True).index(target)
         cmds.setAttr('%s.w%d' % (par_con, target_id), 1.0)
         cmds.setKeyframe('%s.w%d' % (par_con, target_id), ott='step')
-        print target_id
+        log.info(target_id)
 
         # snap the position of the snap control on the previous position and set the keys of the snap control
         set_world_location(space_offset[0], space_offset_location)
@@ -254,7 +254,7 @@ def add_space_switch_transforms(transform_node=None):
         if cmds.ls(selection=True):
             transform_node = cmds.ls(selection=True)[0]
         else:
-            LOG.error('No node specified/selected to add space switch transforms to')
+            log.error('No node specified/selected to add space switch transforms to')
             return
 
     if cmds.objExists(transform_node):
@@ -270,7 +270,7 @@ def add_space_switch_transforms(transform_node=None):
         add_message_attribute(transform_node, [space_constraint], 'space_constraint')
         add_message_attribute(transform_node, [space_offset], 'space_offset')
 
-        LOG.info('Successfully added space switch transforms to {}'.format(transform_node))
+        log.info('Successfully added space switch transforms to {}'.format(transform_node))
         return [space_constraint, space_offset]
 
 
@@ -297,7 +297,7 @@ def insert_as_parent(node, name=None, suffix=None, node_type='transform'):
         return insert_transform
 
     else:
-        LOG.error('{} does not exist!'.format(node))
+        log.error('{} does not exist!'.format(node))
         return
 
 
@@ -332,7 +332,7 @@ def add_message_attribute(src, tgts, attrName):
             i = i + 1
 
     except RuntimeError:
-        LOG.error("Failed to create message attr connections")
+        log.error("Failed to create message attr connections")
         raise
 
 
@@ -351,7 +351,7 @@ def get_message_attribute_connections(src, attrName):
             tgts = cmds.listConnections("%s.%s" % (src, attrName))
             return tgts
     except RuntimeError:
-        LOG.error("Message attr %s cannot be found on %s" % (attrName, src))
+        log.error("Message attr %s cannot be found on %s" % (attrName, src))
         raise
 
 
