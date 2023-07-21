@@ -105,7 +105,6 @@ class load(shelf_base._shelf):
             "Explore to Project Directory",
             command="from mechRig_toolkit.shelves "
             "import shelf_mechRig_utils;"
-            "reload(shelf_mechRig_utils);"
             "shelf_mechRig_utils.explore_maya_project()",
         )
 
@@ -118,7 +117,6 @@ class load(shelf_base._shelf):
             "Setup Marking Menu",
             command="from mechRig_toolkit.shelves "
             "import shelf_mechRig_utils;"
-            "reload(shelf_mechRig_utils);"
             "shelf_mechRig_utils.setup_mech_rig_marking_menu()",
         )
 
@@ -130,7 +128,6 @@ class load(shelf_base._shelf):
             general_tools_menu,
             "Toggle anti-alias viewport display",
             command="from mechRig_toolkit.utils import general; "
-            "reload(general);"
             "general.toggle_antialias_viewport_display()",
         )
 
@@ -138,7 +135,6 @@ class load(shelf_base._shelf):
             general_tools_menu,
             "Set near clip plane",
             command="from mechRig_toolkit.utils import general; "
-            "reload(general);"
             "general.set_near_clip()",
         )
 
@@ -154,7 +150,6 @@ class load(shelf_base._shelf):
             snap_tools_menu,
             "Locator at selected position",
             command="from mechRig_toolkit.utils import locator; "
-            "reload(locator);"
             "locator.selected_points()",
         )
 
@@ -162,7 +157,6 @@ class load(shelf_base._shelf):
             snap_tools_menu,
             "Locator at selected position/rotation",
             command="from mechRig_toolkit.utils import locator; "
-            "reload(locator);"
             "locator.create_locator_snap()",
         )
 
@@ -171,7 +165,6 @@ class load(shelf_base._shelf):
             "Locator at center of selected",
             command="from mechRig_toolkit.utils "
             "import locator;"
-            "reload(locator);"
             "locator.center_selection()",
         )
 
@@ -180,7 +173,6 @@ class load(shelf_base._shelf):
             "Locator aimed at selected",
             command="from mechRig_toolkit.utils "
             "import locator;"
-            "reload(locator);"
             "locator.aim_selection()",
         )
 
@@ -193,7 +185,6 @@ class load(shelf_base._shelf):
             "Snap first items to last",
             command="from mechRig_toolkit.utils "
             "import locator;"
-            "reload(locator);"
             "locator.snap_object()",
         )
 
@@ -208,7 +199,7 @@ class load(shelf_base._shelf):
         self.addMenuItem(
             joint_tools_menu,
             "Create follicles/joints on selected surface...",
-            command="from mechRig_toolkit.utils import follicles; reload(follicles); follicles.create_follicles_along_selected_surface();",
+            command="from mechRig_toolkit.utils import follicles; follicles.create_follicles_along_selected_surface();",
         )
 
         self.addMenuItemDivider(
@@ -245,19 +236,19 @@ class load(shelf_base._shelf):
         self.addMenuItem(
             skin_tools_menu,
             "Transfer Skin: Source -> Target",
-            command="from mechRig_toolkit.utils import skin; reload(skin); skin.do_transfer_skin();",
+            command="from mechRig_toolkit.utils import skin; skin.do_transfer_skin();",
         )
 
         self.addMenuItem(
             skin_tools_menu,
             "Rename Shape Deformed nodes on selected...",
-            command="from mechRig_toolkit.utils import skin; reload(skin); skin.rename_shape_deformed_nodes();",
+            command="from mechRig_toolkit.utils import skin; skin.rename_shape_deformed_nodes();",
         )
 
         self.addMenuItem(
             skin_tools_menu,
             "Print skinCluster command from selected...",
-            command="from mechRig_toolkit.utils import skin; reload(skin); skin.return_skin_command();",
+            command="from mechRig_toolkit.utils import skin; skin.return_skin_command();",
         )
 
         self.addMenuItemDivider(
@@ -267,13 +258,13 @@ class load(shelf_base._shelf):
         self.addMenuItem(
             skin_tools_menu,
             "Import skin weight file onto selected (if it exists)...",
-            command="from mechRig_toolkit.utils import skin; reload(skin); skin.import_skin_weights_selected();",
+            command="from mechRig_toolkit.utils import skin; skin.import_skin_weights_selected();",
         )
 
         self.addMenuItem(
             skin_tools_menu,
             "Export skin weight file from selected...",
-            command="from mechRig_toolkit.utils import skin; reload(skin); skin.export_skin_weights_selected();",
+            command="from mechRig_toolkit.utils import skin; skin.export_skin_weights_selected();",
         )
 
         # Anim Control Tools

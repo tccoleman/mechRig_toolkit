@@ -57,6 +57,7 @@ class MarkingMenu:
         pm.popupMenu(MENU_NAME, e=True, dai=True)
 
         # Tool Launch Menu
+        # TODO : replace every instance of this kind of stuff with a call to a lambda to remove pymel dependency
         pm.menuItem(
             p=menu, l="Script Editor", c=pm.Callback(pm.mel.eval, "ScriptEditor;")
         )
@@ -280,9 +281,9 @@ def rebuildMarkingMenu(*args):
     and all it does is reload the module and initialize the markingMenu class which
     rebuilds our marking menu"""
     cmds.evalDeferred(
-        """from mechRig_toolkit.marking_menu import mechRig_marking_menu;reload(mechRig_marking_menu);mechRig_marking_menu.markingMenu()"""
+        """from mechRig_toolkit.marking_menu import mechRig_marking_menu;mechRig_marking_menu.markingMenu()"""
     )
-    log.info("Mech Rig Marking Menu reloaded successfully!")
+    log.info("Mech Rig Marking Menu loaded successfully!")
 
 
 MarkingMenu()
