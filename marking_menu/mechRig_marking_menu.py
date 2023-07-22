@@ -13,8 +13,9 @@ mechRig_marking_menu.markingMenu()
 *Use RMB + CTL + ALT to invoke marking menu
 """
 import logging
+from mechRig_toolkit.utils import locator
 
-from maya import cmds
+from maya import cmds, mel
 import pymel.core as pm
 
 log = logging.getLogger(__name__)
@@ -58,24 +59,31 @@ class MarkingMenu:
 
         # Tool Launch Menu
         # TODO : replace every instance of this kind of stuff with a call to a lambda to remove pymel dependency
-        pm.menuItem(
-            p=menu, l="Script Editor", c=pm.Callback(pm.mel.eval, "ScriptEditor;")
-        )
-        pm.menuItem(
-            p=menu, l="Node Editor", c=pm.Callback(pm.mel.eval, "NodeEditorWindow;")
-        )
+        script_editor = lambda *args: mel.eval("ScriptEditor;")
+        pm.menuItem(p=menu, l="Script Editor", c=script_editor)
+
+        node_editor = lambda *args: mel.eval("NodeEditorWindow;")
+        pm.menuItem(p=menu, l="Node Editor", c=node_editor)
+
+        connection_editor = lambda *args: mel.eval("ConnectionEditor;")
         pm.menuItem(
             p=menu,
             l="Connection Editor",
-            c=pm.Callback(pm.mel.eval, "ConnectionEditor;"),
+            c=connection_editor,
         )
-        pm.menuItem(p=menu, l="Outliner", c=pm.Callback(pm.mel.eval, "OutlinerWindow;"))
+
+        outliner = lambda *args: mel.eval("OutlinerWindow;")
+        pm.menuItem(p=menu, l="Outliner", c=outliner)
+
         pm.menuItem(p=menu, d=True)
+
+        paint_skin = lambda *args : mel.eval("ArtPaintSkinWeightsToolOptions;")
         pm.menuItem(
             p=menu,
             l="Paint Weights",
-            c=pm.Callback(pm.mel.eval, "ArtPaintSkinWeightsToolOptions;"),
+            c=paint_skin,
         )
+
         pm.menuItem(p=menu, d=True)
 
         # Rebuild
@@ -92,45 +100,38 @@ class MarkingMenu:
         pm.menuItem(
             p=locMenu,
             l="Locator(s) at selected",
-            c=pm.Callback(
-                pm.python,
-                "from mechRig_toolkit.utils "
-                "import locator; locator.selected_points();",
-            ),
+            c=locator.selected_points
         )
         pm.menuItem(
             p=locMenu,
             l="Locator(s) at center of selected",
-            c=pm.Callback(
-                pm.python,
-                "from mechRig_toolkit.utils "
-                "import locator; locator.center_selection();",
-            ),
+            c=locator.center_selection
         )
 
     # E
     def _buildJointMenu(self, menu, parent):
         jntMenu = pm.menuItem(p=menu, l="Joints", rp="E", subMenu=1)
 
-        pm.menuItem(p=jntMenu, l="Show Joint Axis", c=pm.Callback(self.showPivot))
+        pm.menuItem(p=jntMenu, l="Show Joint Axis", c=self.showPivot)
         pm.menuItem(
-            p=jntMenu, l="Disable Segment Scale Compensate", c=pm.Callback(self.setSSC)
+            p=jntMenu, l="Disable Segment Scale Compensate", c=self.setSSC
         )
         pm.menuItem(
-            p=jntMenu, l="Show/Hide Joint Orient", c=pm.Callback(self.showJointOrient)
+            p=jntMenu, l="Show/Hide Joint Orient", c=self.showJointOrient
         )
 
+        create_joint = lambda *args: mel.eval("JointTool;")
         pm.menuItem(
             p=jntMenu,
             l="Create Joint Tool",
             rp="N",
-            c=pm.Callback(pm.mel.eval, "JointTool;"),
+            c=create_joint,
         )
         pm.menuItem(
             p=jntMenu,
             l="Edit Joint Pivot Tool",
             rp="NE",
-            c=pm.Callback(self.editJointPivotTool),
+            c=self.editJointPivotTool,
         )
 
         rotationMenu = pm.menuItem(p=jntMenu, l="Rotations", rp="E", subMenu=1)
@@ -138,37 +139,37 @@ class MarkingMenu:
             p=rotationMenu,
             l="Freeze Rotations",
             rp="E",
-            c=pm.Callback(self.freezeRotation),
+            c=self.freezeRotation,
         )
         pm.menuItem(
             p=rotationMenu,
             l="Restore Rotations",
             rp="N",
-            c=pm.Callback(self.restoreRotation),
+            c=self.restoreRotation,
         )
         pm.menuItem(
             p=rotationMenu,
             l="Rotations to Joint Orient",
             rp="NW",
-            c=pm.Callback(self.rotateToJointOrient),
+            c=self.rotateToJointOrient,
         )
         pm.menuItem(
             p=rotationMenu,
             l="Zero Joint Rotations",
             rp="S",
-            c=pm.Callback(self.zeroJointRotate),
+            c=self.zeroJointRotate,
         )
         pm.menuItem(
             p=rotationMenu,
             l="Zero Joint Orient",
             rp="SE",
-            c=pm.Callback(self.zeroJointOrient),
+            c=self.zeroJointOrient,
         )
         pm.menuItem(
             p=rotationMenu,
             l="Zero Joint Axis",
             rp="SW",
-            c=pm.Callback(self.zeroJointAxis),
+            c=self.zeroJointAxis,
         )
 
     def showPivot(self):
