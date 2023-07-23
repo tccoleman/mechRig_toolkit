@@ -55,36 +55,35 @@ class MarkingMenu:
 
     def _buildMarkingMenu(self, menu, parent):
         """This is where all the elements of the marking menu our built."""
-        pm.popupMenu(MENU_NAME, e=True, dai=True)
+        cmds.popupMenu(MENU_NAME, e=True, dai=True)
 
         # Tool Launch Menu
-        # TODO : replace every instance of this kind of stuff with a call to a lambda to remove pymel dependency
         script_editor = lambda *args: mel.eval("ScriptEditor;")
-        pm.menuItem(p=menu, l="Script Editor", c=script_editor)
+        cmds.menuItem(p=menu, l="Script Editor", c=script_editor)
 
         node_editor = lambda *args: mel.eval("NodeEditorWindow;")
-        pm.menuItem(p=menu, l="Node Editor", c=node_editor)
+        cmds.menuItem(p=menu, l="Node Editor", c=node_editor)
 
         connection_editor = lambda *args: mel.eval("ConnectionEditor;")
-        pm.menuItem(
+        cmds.menuItem(
             p=menu,
             l="Connection Editor",
             c=connection_editor,
         )
 
         outliner = lambda *args: mel.eval("OutlinerWindow;")
-        pm.menuItem(p=menu, l="Outliner", c=outliner)
+        cmds.menuItem(p=menu, l="Outliner", c=outliner)
 
-        pm.menuItem(p=menu, d=True)
+        cmds.menuItem(p=menu, d=True)
 
         paint_skin = lambda *args : mel.eval("ArtPaintSkinWeightsToolOptions;")
-        pm.menuItem(
+        cmds.menuItem(
             p=menu,
             l="Paint Weights",
             c=paint_skin,
         )
 
-        pm.menuItem(p=menu, d=True)
+        cmds.menuItem(p=menu, d=True)
 
         # Rebuild
         cmds.menuItem(p=menu, l="Rebuild Marking Menu", c=rebuildMarkingMenu)
@@ -95,14 +94,14 @@ class MarkingMenu:
 
     # W
     def _buildLocatorMenu(self, menu, parent):
-        locMenu = pm.menuItem(p=menu, l="Locators", rp="W", subMenu=1)
+        locMenu = cmds.menuItem(p=menu, l="Locators", rp="W", subMenu=1)
 
-        pm.menuItem(
+        cmds.menuItem(
             p=locMenu,
             l="Locator(s) at selected",
             c=locator.selected_points
         )
-        pm.menuItem(
+        cmds.menuItem(
             p=locMenu,
             l="Locator(s) at center of selected",
             c=locator.center_selection
@@ -110,62 +109,62 @@ class MarkingMenu:
 
     # E
     def _buildJointMenu(self, menu, parent):
-        jntMenu = pm.menuItem(p=menu, l="Joints", rp="E", subMenu=1)
+        jntMenu = cmds.menuItem(p=menu, l="Joints", rp="E", subMenu=1)
 
-        pm.menuItem(p=jntMenu, l="Show Joint Axis", c=self.showPivot)
-        pm.menuItem(
+        cmds.menuItem(p=jntMenu, l="Show Joint Axis", c=self.showPivot)
+        cmds.menuItem(
             p=jntMenu, l="Disable Segment Scale Compensate", c=self.setSSC
         )
-        pm.menuItem(
+        cmds.menuItem(
             p=jntMenu, l="Show/Hide Joint Orient", c=self.showJointOrient
         )
 
         create_joint = lambda *args: mel.eval("JointTool;")
-        pm.menuItem(
+        cmds.menuItem(
             p=jntMenu,
             l="Create Joint Tool",
             rp="N",
             c=create_joint,
         )
-        pm.menuItem(
+        cmds.menuItem(
             p=jntMenu,
             l="Edit Joint Pivot Tool",
             rp="NE",
             c=self.editJointPivotTool,
         )
 
-        rotationMenu = pm.menuItem(p=jntMenu, l="Rotations", rp="E", subMenu=1)
-        pm.menuItem(
+        rotationMenu = cmds.menuItem(p=jntMenu, l="Rotations", rp="E", subMenu=1)
+        cmds.menuItem(
             p=rotationMenu,
             l="Freeze Rotations",
             rp="E",
             c=self.freezeRotation,
         )
-        pm.menuItem(
+        cmds.menuItem(
             p=rotationMenu,
             l="Restore Rotations",
             rp="N",
             c=self.restoreRotation,
         )
-        pm.menuItem(
+        cmds.menuItem(
             p=rotationMenu,
             l="Rotations to Joint Orient",
             rp="NW",
             c=self.rotateToJointOrient,
         )
-        pm.menuItem(
+        cmds.menuItem(
             p=rotationMenu,
             l="Zero Joint Rotations",
             rp="S",
             c=self.zeroJointRotate,
         )
-        pm.menuItem(
+        cmds.menuItem(
             p=rotationMenu,
             l="Zero Joint Orient",
             rp="SE",
             c=self.zeroJointOrient,
         )
-        pm.menuItem(
+        cmds.menuItem(
             p=rotationMenu,
             l="Zero Joint Axis",
             rp="SW",
@@ -173,38 +172,36 @@ class MarkingMenu:
         )
 
     def showPivot(self):
-        objs = pm.selected()
+        objs = cmds.ls(selection=True)
         for obj in objs:
             obj.displayLocalAxis.set(not (obj.displayLocalAxis.get()))
 
     def rotateToJointOrient(self):
-        objs = pm.selected()
+        objs = cmds.ls(selection=True)
         for obj in objs:
-            if isinstance(obj, pm.nt.Joint):
-                rot = obj.rotate.get()
-                obj.jointOrient.set(rot)
-                obj.rotate.set(0, 0, 0)
+            if cmds.nodeType(obj) == "joint":
+                cmds.makeIdentity(obj, rotate=True, apply=True)
 
     def zeroJointRotate(self):
-        objs = pm.selected()
+        objs = cmds.ls(selection=True)
         for obj in objs:
-            if isinstance(obj, pm.nt.Joint):
-                obj.jointRotate.set(0, 0, 0)
+            if cmds.nodeType(obj) == "joint":
+                cmds.setAttr("{}.rotate".format(obj), 0, 0, 0, type="double3")
 
     def zeroJointOrient(self):
-        objs = pm.selected()
+        objs = cmds.ls(selection=True)
         for obj in objs:
-            if isinstance(obj, pm.nt.Joint):
-                obj.jointOrient.set(0, 0, 0)
+            if cmds.nodeType(obj) == "joint":
+                cmds.setAttr("{}.jointOrient".format(obj), 0, 0, 0, type="double3")
 
     def zeroJointAxis(self):
-        objs = pm.selected()
+        objs = cmds.ls(selection=True)
         for obj in objs:
-            if isinstance(obj, pm.nt.Joint):
-                obj.Axis.set(0, 0, 0)
+            if cmds.nodeType(obj) == "joint":
+                cmds.setAttr("{}.rotateAxis".format(obj), 0, 0, 0, type="double3")
 
     def editJointPivotTool(self):
-        objs = pm.selected()
+        objs = cmds.ls(selection=True)
         pm.selectMode(co=True)
         pm.selectType(ra=True)
         pm.select(objs[0].rotateAxis, r=True)
@@ -218,7 +215,7 @@ class MarkingMenu:
         pm.selectMode(o=True)
 
     def showJointOrient(self):
-        objs = pm.selected()
+        objs = cmds.ls(selection=True)
         for obj in objs:
             if isinstance(obj, pm.nt.Joint):
                 obj.jox.showInChannelBox(not (obj.jox.isInChannelBox()))
@@ -226,16 +223,13 @@ class MarkingMenu:
                 obj.joz.showInChannelBox(not (obj.joz.isInChannelBox()))
 
     def setSSC(self):
-        objs = pm.selected()
+        objs = cmds.ls(selection=True)
         for obj in objs:
             if isinstance(obj, pm.nt.Joint):
                 obj.ssc.set(False)
 
-    def checkIfPlanar(self):
-        raise NotImplementedError
-
     def restoreRotation(self):
-        objs = pm.selected()
+        objs = cmds.ls(selection=True)
         for obj in objs:
             if isinstance(obj, pm.nt.Joint):
                 rot = obj.rotate.get()
@@ -256,7 +250,7 @@ class MarkingMenu:
                 obj.rotate.set(newRotation)
 
     def freezeRotation(self):
-        objs = pm.selected()
+        objs = cmds.ls(selection=True)
         for obj in objs:
             if isinstance(obj, pm.nt.Joint):
                 rot = obj.rotate.get()
