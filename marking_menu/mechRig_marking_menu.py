@@ -202,22 +202,23 @@ class MarkingMenu:
 
     def editJointPivotTool(self):
         objs = cmds.ls(selection=True)
-        pm.selectMode(co=True)
-        pm.selectType(ra=True)
-        pm.select(objs[0].rotateAxis, r=True)
-        rotateCtx = pm.manipRotateContext(
-            psc=pm.Callback(self.editJointPivotExit, objs)
+        cmds.selectMode(co=True)
+        cmds.selectType(ra=True)
+        cmds.select(objs[0], r=True)
+        exit_context = lambda *args: self.editJointPivotExit(objs)
+        rotateCtx = cmds.manipRotateContext(
+            pod=exit_context
         )
-        pm.setToolTo(rotateCtx)
+        cmds.setToolTo(rotateCtx)
 
     def editJointPivotExit(self, objects):
-        pm.select(objects, r=True)
-        pm.selectMode(o=True)
+        cmds.select(objects, r=True)
+        cmds.selectMode(o=True)
 
     def showJointOrient(self):
         objs = cmds.ls(selection=True)
         for obj in objs:
-            if isinstance(obj, pm.nt.Joint):
+            if cmds.nodeType(obj) == "joint":
                 obj.jox.showInChannelBox(not (obj.jox.isInChannelBox()))
                 obj.joy.showInChannelBox(not (obj.joy.isInChannelBox()))
                 obj.joz.showInChannelBox(not (obj.joz.isInChannelBox()))
@@ -225,13 +226,13 @@ class MarkingMenu:
     def setSSC(self):
         objs = cmds.ls(selection=True)
         for obj in objs:
-            if isinstance(obj, pm.nt.Joint):
+            if cmds.nodeType(obj) == "joint":
                 obj.ssc.set(False)
 
     def restoreRotation(self):
         objs = cmds.ls(selection=True)
         for obj in objs:
-            if isinstance(obj, pm.nt.Joint):
+            if cmds.nodeType(obj) == "joint":
                 rot = obj.rotate.get()
                 ra = obj.rotateAxis.get()
                 jo = obj.jointOrient.get()
@@ -252,7 +253,7 @@ class MarkingMenu:
     def freezeRotation(self):
         objs = cmds.ls(selection=True)
         for obj in objs:
-            if isinstance(obj, pm.nt.Joint):
+            if cmds.nodeType(obj) == "joint":
                 rot = obj.rotate.get()
                 ra = obj.rotateAxis.get()
                 jo = obj.jointOrient.get()
