@@ -16,7 +16,6 @@ import logging
 from mechRig_toolkit.utils import locator
 
 from maya import cmds, mel
-import pymel.core as pm
 
 log = logging.getLogger(__name__)
 
@@ -233,43 +232,15 @@ class MarkingMenu:
         objs = cmds.ls(selection=True)
         for obj in objs:
             if cmds.nodeType(obj) == "joint":
-                rot = obj.rotate.get()
-                ra = obj.rotateAxis.get()
-                jo = obj.jointOrient.get()
-
-                rotMatrix = pm.dt.EulerRotation(rot, unit="degrees").asMatrix()
-                raMatrix = pm.dt.EulerRotation(ra, unit="degrees").asMatrix()
-                joMatrix = pm.dt.EulerRotation(jo, unit="degrees").asMatrix()
-
-                rotationMatrix = raMatrix * rotMatrix * joMatrix
-                tmat = pm.dt.TransformationMatrix(rotationMatrix)
-                newRotation = tmat.eulerRotation()
-                newRotation = [pm.dt.degrees(x) for x in newRotation.asVector()]
-
-                obj.jointOrient.set(0, 0, 0)
-                obj.rotateAxis.set(0, 0, 0)
-                obj.rotate.set(newRotation)
+                cmds.makeIdentity(obj, rotate=True, apply=True)
+                rot = cmds.getAttr("{}.jointOrient".format(obj))[0]
+                cmds.setAttr("{}.rotate".format(obj), rot[0], rot[1], rot[2], type="double3")
+                cmds.setAttr("{}.jointOrient".format(obj), 0, 0, 0, type="double3")
 
     def freezeRotation(self):
         objs = cmds.ls(selection=True)
         for obj in objs:
-            if cmds.nodeType(obj) == "joint":
-                rot = obj.rotate.get()
-                ra = obj.rotateAxis.get()
-                jo = obj.jointOrient.get()
-
-                rotMatrix = pm.dt.EulerRotation(rot, unit="degrees").asMatrix()
-                raMatrix = pm.dt.EulerRotation(ra, unit="degrees").asMatrix()
-                joMatrix = pm.dt.EulerRotation(jo, unit="degrees").asMatrix()
-
-                rotationMatrix = rotMatrix * raMatrix * joMatrix
-                tmat = pm.dt.TransformationMatrix(rotationMatrix)
-                newRotation = tmat.eulerRotation()
-                newRotation = [pm.dt.degrees(x) for x in newRotation.asVector()]
-
-                obj.rotate.set(0, 0, 0)
-                obj.rotateAxis.set(0, 0, 0)
-                obj.jointOrient.set(newRotation)
+            cmds.makeIdentity(obj, rotate=True, apply=True)
 
 
 def rebuildMarkingMenu(*args):
