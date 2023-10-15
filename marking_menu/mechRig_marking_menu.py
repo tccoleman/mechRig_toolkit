@@ -98,11 +98,15 @@ class MarkingMenu:
         cmds.menuItem(
             p=locMenu,
             l="Locator(s) at selected",
+
+            # TODO : turn this call into proper cmds instead of pymel classes
             c=locator.selected_points
         )
         cmds.menuItem(
             p=locMenu,
             l="Locator(s) at center of selected",
+
+            # TODO : turn this call into proper cmds instead of pymel classes
             c=locator.center_selection
         )
 
@@ -173,6 +177,7 @@ class MarkingMenu:
     def showPivot(self):
         objs = cmds.ls(selection=True)
         for obj in objs:
+                    # TODO : turn this call into proper cmds instead of pymel classes
             obj.displayLocalAxis.set(not (obj.displayLocalAxis.get()))
 
     def rotateToJointOrient(self):
@@ -218,6 +223,7 @@ class MarkingMenu:
         objs = cmds.ls(selection=True)
         for obj in objs:
             if cmds.nodeType(obj) == "joint":
+                        # TODO : turn this call into proper cmds instead of pymel classes
                 obj.jox.showInChannelBox(not (obj.jox.isInChannelBox()))
                 obj.joy.showInChannelBox(not (obj.joy.isInChannelBox()))
                 obj.joz.showInChannelBox(not (obj.joz.isInChannelBox()))
@@ -226,6 +232,7 @@ class MarkingMenu:
         objs = cmds.ls(selection=True)
         for obj in objs:
             if cmds.nodeType(obj) == "joint":
+                        # TODO : turn this call into proper cmds instead of pymel classes
                 obj.ssc.set(False)
 
     def restoreRotation(self):
