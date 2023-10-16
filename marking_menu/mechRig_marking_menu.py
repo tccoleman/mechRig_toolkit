@@ -75,7 +75,7 @@ class MarkingMenu:
 
         cmds.menuItem(p=menu, d=True)
 
-        paint_skin = lambda *args : mel.eval("ArtPaintSkinWeightsToolOptions;")
+        paint_skin = lambda *args: mel.eval("ArtPaintSkinWeightsToolOptions;")
         cmds.menuItem(
             p=menu,
             l="Paint Weights",
@@ -95,19 +95,9 @@ class MarkingMenu:
     def _buildLocatorMenu(self, menu, parent):
         locMenu = cmds.menuItem(p=menu, l="Locators", rp="W", subMenu=1)
 
+        cmds.menuItem(p=locMenu, l="Locator(s) at selected", c=locator.selected_points)
         cmds.menuItem(
-            p=locMenu,
-            l="Locator(s) at selected",
-
-            # TODO : turn this call into proper cmds instead of pymel classes
-            c=locator.selected_points
-        )
-        cmds.menuItem(
-            p=locMenu,
-            l="Locator(s) at center of selected",
-
-            # TODO : turn this call into proper cmds instead of pymel classes
-            c=locator.center_selection
+            p=locMenu, l="Locator(s) at center of selected", c=locator.center_selection
         )
 
     # E
@@ -115,12 +105,8 @@ class MarkingMenu:
         jntMenu = cmds.menuItem(p=menu, l="Joints", rp="E", subMenu=1)
 
         cmds.menuItem(p=jntMenu, l="Show Joint Axis", c=self.showPivot)
-        cmds.menuItem(
-            p=jntMenu, l="Disable Segment Scale Compensate", c=self.setSSC
-        )
-        cmds.menuItem(
-            p=jntMenu, l="Show/Hide Joint Orient", c=self.showJointOrient
-        )
+        cmds.menuItem(p=jntMenu, l="Disable Segment Scale Compensate", c=self.setSSC)
+        cmds.menuItem(p=jntMenu, l="Show/Hide Joint Orient", c=self.showJointOrient)
 
         create_joint = lambda *args: mel.eval("JointTool;")
         cmds.menuItem(
@@ -177,8 +163,10 @@ class MarkingMenu:
     def showPivot(self):
         objs = cmds.ls(selection=True)
         for obj in objs:
-                    # TODO : turn this call into proper cmds instead of pymel classes
-            obj.displayLocalAxis.set(not (obj.displayLocalAxis.get()))
+            cmds.setAttr(
+                "{}.displayLocalAxis".format(obj),
+                not cmds.getAttr("{}.displayLocalAxis".format(obj)),
+            )
 
     def rotateToJointOrient(self):
         objs = cmds.ls(selection=True)
@@ -210,9 +198,7 @@ class MarkingMenu:
         cmds.selectType(ra=True)
         cmds.select(objs[0], r=True)
         exit_context = lambda *args: self.editJointPivotExit(objs)
-        rotateCtx = cmds.manipRotateContext(
-            pod=exit_context
-        )
+        rotateCtx = cmds.manipRotateContext(pod=exit_context)
         cmds.setToolTo(rotateCtx)
 
     def editJointPivotExit(self, objects):
@@ -223,17 +209,18 @@ class MarkingMenu:
         objs = cmds.ls(selection=True)
         for obj in objs:
             if cmds.nodeType(obj) == "joint":
-                        # TODO : turn this call into proper cmds instead of pymel classes
-                obj.jox.showInChannelBox(not (obj.jox.isInChannelBox()))
-                obj.joy.showInChannelBox(not (obj.joy.isInChannelBox()))
-                obj.joz.showInChannelBox(not (obj.joz.isInChannelBox()))
+                for axis in ["X", "Y", "Z"]:
+                    attribute_name = "{}.jointOrient{}".format(obj, axis)
+                    cmds.setAttr(
+                        attribute_name,
+                        channelBox=(not cmds.getAttr(attribute_name, channelBox=True)),
+                    )
 
     def setSSC(self):
         objs = cmds.ls(selection=True)
         for obj in objs:
             if cmds.nodeType(obj) == "joint":
-                        # TODO : turn this call into proper cmds instead of pymel classes
-                obj.ssc.set(False)
+                cmds.setAttr("{}.segmentScaleCompensate ".format(obj), False)
 
     def restoreRotation(self):
         objs = cmds.ls(selection=True)
@@ -241,7 +228,9 @@ class MarkingMenu:
             if cmds.nodeType(obj) == "joint":
                 cmds.makeIdentity(obj, rotate=True, apply=True)
                 rot = cmds.getAttr("{}.jointOrient".format(obj))[0]
-                cmds.setAttr("{}.rotate".format(obj), rot[0], rot[1], rot[2], type="double3")
+                cmds.setAttr(
+                    "{}.rotate".format(obj), rot[0], rot[1], rot[2], type="double3"
+                )
                 cmds.setAttr("{}.jointOrient".format(obj), 0, 0, 0, type="double3")
 
     def freezeRotation(self):
