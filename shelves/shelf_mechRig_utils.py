@@ -24,6 +24,7 @@ import subprocess
 import sys
 
 from maya import cmds
+import maya
 
 from mechRig_toolkit.utils import locator
 
@@ -103,8 +104,7 @@ class load(shelf_base._shelf):
         self.addMenuItem(
             general_tools_menu,
             "Explore to Project Directory",
-            command="from mechRig_toolkit.shelves "
-            "import shelf_mechRig_utils;"
+            command="from mechRig_toolkit.shelves import shelf_mechRig_utils;"
             "shelf_mechRig_utils.explore_maya_project()",
         )
 
@@ -115,8 +115,7 @@ class load(shelf_base._shelf):
         self.addMenuItem(
             general_tools_menu,
             "Setup Marking Menu",
-            command="from mechRig_toolkit.shelves "
-            "import shelf_mechRig_utils;"
+            command="from mechRig_toolkit.shelves import shelf_mechRig_utils;"
             "shelf_mechRig_utils.setup_mech_rig_marking_menu()",
         )
 
@@ -163,16 +162,14 @@ class load(shelf_base._shelf):
         self.addMenuItem(
             snap_tools_menu,
             "Locator at center of selected",
-            command="from mechRig_toolkit.utils "
-            "import locator;"
+            command="from mechRig_toolkit.utils import locator;"
             "locator.center_selection()",
         )
 
         self.addMenuItem(
             snap_tools_menu,
             "Locator aimed at selected",
-            command="from mechRig_toolkit.utils "
-            "import locator;"
+            command="from mechRig_toolkit.utils import locator;"
             "locator.aim_selection()",
         )
 
@@ -183,8 +180,7 @@ class load(shelf_base._shelf):
         self.addMenuItem(
             snap_tools_menu,
             "Snap first items to last",
-            command="from mechRig_toolkit.utils "
-            "import locator;"
+            command="from mechRig_toolkit.utils import locator;"
             "locator.snap_object()",
         )
 
@@ -199,7 +195,8 @@ class load(shelf_base._shelf):
         self.addMenuItem(
             joint_tools_menu,
             "Create follicles/joints on selected surface...",
-            command="from mechRig_toolkit.utils import follicles; follicles.create_follicles_along_selected_surface();",
+            command="from mechRig_toolkit.utils import follicles;"
+            "follicles.create_follicles_along_selected_surface();",
         )
 
         self.addMenuItemDivider(
@@ -222,7 +219,7 @@ class load(shelf_base._shelf):
         self.addMenuItem(
             joint_tools_menu,
             "Orient To",
-            command="from mechRig_toolkit.utils import joints; joints.orientTo();",
+            command="from mechRig_toolkit.utils import joints;" "joints.orientTo();",
         )
 
         # Skin Tools
@@ -236,19 +233,22 @@ class load(shelf_base._shelf):
         self.addMenuItem(
             skin_tools_menu,
             "Transfer Skin: Source -> Target",
-            command="from mechRig_toolkit.utils import skin; skin.do_transfer_skin();",
+            command="from mechRig_toolkit.utils import skin;"
+            "skin.do_transfer_skin();",
         )
 
         self.addMenuItem(
             skin_tools_menu,
             "Rename Shape Deformed nodes on selected...",
-            command="from mechRig_toolkit.utils import skin; skin.rename_shape_deformed_nodes();",
+            command="from mechRig_toolkit.utils import skin;"
+            "skin.rename_shape_deformed_nodes();",
         )
 
         self.addMenuItem(
             skin_tools_menu,
             "Print skinCluster command from selected...",
-            command="from mechRig_toolkit.utils import skin; skin.return_skin_command();",
+            command="from mechRig_toolkit.utils import skin;"
+            "skin.return_skin_command();",
         )
 
         self.addMenuItemDivider(
@@ -258,13 +258,15 @@ class load(shelf_base._shelf):
         self.addMenuItem(
             skin_tools_menu,
             "Import skin weight file onto selected (if it exists)...",
-            command="from mechRig_toolkit.utils import skin; skin.import_skin_weights_selected();",
+            command="from mechRig_toolkit.utils import skin;"
+            "skin.import_skin_weights_selected();",
         )
 
         self.addMenuItem(
             skin_tools_menu,
             "Export skin weight file from selected...",
-            command="from mechRig_toolkit.utils import skin; skin.export_skin_weights_selected();",
+            command="from mechRig_toolkit.utils import skin;"
+            "skin.export_skin_weights_selected();",
         )
 
         # Anim Control Tools
