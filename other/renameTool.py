@@ -7,24 +7,22 @@
 	renameTool.call_mel()
 
 """
-
-
 import logging
-
-logging.basicConfig()
-LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.INFO)
+import os
 
 from maya import cmds, mel
 
-import os
+logging.basicConfig()
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
 
-MEL_DIR = os.path.dirname(__file__) # Gets full file path to this renameTool.py file
-MEL_DIR = MEL_DIR.replace('\\', '/') # Replaces all back slashes to Maya friendly back slashes
+MEL_DIR = os.path.dirname(__file__)  # Gets full file path to this renameTool.py file
+MEL_DIR = MEL_DIR.replace(
+    "\\", "/"
+)  # Replaces all double backslashes to python friendly slashes
+
 
 def call_mel():
-
-    LOG.info("Sourcing {}/renameTool.mel".format(MEL_DIR))
+    log.info("Sourcing {}/renameTool.mel".format(MEL_DIR))
     mel.eval('source "{}/renameTool.mel"'.format(MEL_DIR))
     mel.eval("renameTool();")
-

@@ -1,22 +1,19 @@
 import logging
-logging.basicConfig()
-LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.INFO)
-
-# Import Python Modules
 import os
 
 # Import Maya modules
 import maya.cmds as cmds
 import maya.OpenMaya as api
 
-#from rigging_utils import common, app, transform, attribute
+logging.basicConfig()
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
 
-SPACEATTR = 'spaces'
+SPACEATTR = "spaces"
 
 # Load plug-in dependencies
-if not cmds.pluginInfo('matrixNodes', q=True, loaded=True):
-    cmds.loadPlugin('matrixNodes', quiet=True)
+if not cmds.pluginInfo("matrixNodes", q=True, loaded=True):
+    cmds.loadPlugin("matrixNodes", quiet=True)
 
 
 def set_space_network_name(ctl, space_name, key=True, keyPrevious=True):
@@ -44,7 +41,9 @@ def set_space_network_name(ctl, space_name, key=True, keyPrevious=True):
         if ctl_list:
             for ctlNode in ctl_list:
                 if cmds.attributeQuery(SPACEATTR, node=ctlNode, exists=True):
-                    set_space_name(ctlNode, space_name, key=key, keyPrevious=keyPrevious)
+                    set_space_name(
+                        ctlNode, space_name, key=key, keyPrevious=keyPrevious
+                    )
 
 
 def set_space_name(node, space_name, space_attr="spaces", key=True, keyPrevious=True):
@@ -62,21 +61,40 @@ def set_space_name(node, space_name, space_attr="spaces", key=True, keyPrevious=
     # Get current transform of ctrl
     wsPos = cmds.xform(node, query=True, ws=True, t=True)
     wsOri = cmds.xform(node, query=True, ws=True, ro=True)
-    valT = cmds.getAttr(node + '.translate')[0]
-    valR = cmds.getAttr(node + '.rotate')[0]
+    valT = cmds.getAttr(node + ".translate")[0]
+    valR = cmds.getAttr(node + ".rotate")[0]
 
     # Key previous frame
     if key and keyPrevious:
-        prevKey = cmds.findKeyframe(node + '.' + space_attr, time=(curFrame, curFrame), which='previous')
+        prevKey = cmds.findKeyframe(
+            node + "." + space_attr, time=(curFrame, curFrame), which="previous"
+        )
         if prevKey != curFrame - 1:
-            cmds.setKeyframe(node + '.' + space_attr, time=curFrame - 1, value=curSpace, itt='clamped',
-                             ott='step')
-        for i, attr in enumerate(['tx', 'ty', 'tz']):
-            cmds.setKeyframe(node + '.' + attr, time=curFrame - 1, value=valT[i], itt='clamped', ott='step')
-        for i, attr in enumerate(['rx', 'ry', 'rz']):
-            cmds.setKeyframe(node + '.' + attr, time=curFrame - 1, value=valR[i], itt='clamped', ott='step')
+            cmds.setKeyframe(
+                node + "." + space_attr,
+                time=curFrame - 1,
+                value=curSpace,
+                itt="clamped",
+                ott="step",
+            )
+        for i, attr in enumerate(["tx", "ty", "tz"]):
+            cmds.setKeyframe(
+                node + "." + attr,
+                time=curFrame - 1,
+                value=valT[i],
+                itt="clamped",
+                ott="step",
+            )
+        for i, attr in enumerate(["rx", "ry", "rz"]):
+            cmds.setKeyframe(
+                node + "." + attr,
+                time=curFrame - 1,
+                value=valR[i],
+                itt="clamped",
+                ott="step",
+            )
 
-    cmds.setAttr('%s.%s' % (node, space_attr), index)
+    cmds.setAttr("%s.%s" % (node, space_attr), index)
 
     # Now that we're in the next space, set the transform back to the previous pos/ori
     cmds.xform(node, ws=True, a=True, t=[wsPos[0], wsPos[1], wsPos[2]])
@@ -84,10 +102,10 @@ def set_space_name(node, space_name, space_attr="spaces", key=True, keyPrevious=
 
     # Key current frame
     if key:
-        for i, attr in enumerate([space_attr, 'tx', 'ty', 'tz', 'rx', 'ry', 'rz']):
-            cmds.setKeyframe(node + '.' + attr, itt='clamped', ott='step')
+        for i, attr in enumerate([space_attr, "tx", "ty", "tz", "rx", "ry", "rz"]):
+            cmds.setKeyframe(node + "." + attr, itt="clamped", ott="step")
 
-    LOG.info('Set space for "%s" to "%s"...' % (node, space_name))
+    log.info('Set space for "%s" to "%s"...' % (node, space_name))
 
 
 def cycleSpaceUI():
@@ -96,22 +114,24 @@ def cycleSpaceUI():
     if sel:
         for item in sel:
             if cmds.attributeQuery("spaces", node=item, exists=True):
-                result = cmds.confirmDialog(title='Confirm',
-                                            message='Key current and previous frames?',
-                                            button=['Yes', 'No'],
-                                            defaultButton='Yes',
-                                            cancelButton='No',
-                                            dismissString='No')
-                if 'Yes' in result:
+                result = cmds.confirmDialog(
+                    title="Confirm",
+                    message="Key current and previous frames?",
+                    button=["Yes", "No"],
+                    defaultButton="Yes",
+                    cancelButton="No",
+                    dismissString="No",
+                )
+                if "Yes" in result:
                     cycleControlSpace(key=True, keyPrevious=True)
 
-                elif 'No' in result:
+                elif "No" in result:
                     cycleControlSpace(key=False, keyPrevious=False)
 
                 else:
                     pass
             else:
-                LOG.warning("No spaces attribute on {}, skipping...".format(item))
+                log.warning("No spaces attribute on {}, skipping...".format(item))
 
 
 def cycleControlSpace(key=True, keyPrevious=True):
@@ -129,38 +149,58 @@ def cycleControlSpace(key=True, keyPrevious=True):
 
     if selection:
         for ctrl in selection:
-
             # Get the proper space attr name as some rigs use "Space" and others use "space"
-            spaceAttrName = ''
-            if cmds.attributeQuery('spaces', exists=True, node=ctrl):
-                spaceAttrName = 'spaces'
+            spaceAttrName = ""
+            if cmds.attributeQuery("spaces", exists=True, node=ctrl):
+                spaceAttrName = "spaces"
 
-            elif cmds.attributeQuery('Space', exists=True, node=ctrl):
-                spaceAttrName = 'Space'
+            elif cmds.attributeQuery("Space", exists=True, node=ctrl):
+                spaceAttrName = "Space"
 
             else:
-                LOG.error('Cannot find spaces attribute on selected control!')
+                log.error("Cannot find spaces attribute on selected control!")
                 return
 
             curFrame = cmds.currentTime(q=True)
-            curSpace = cmds.getAttr(ctrl + '.' + spaceAttrName)
+            curSpace = cmds.getAttr(ctrl + "." + spaceAttrName)
 
             # Get current space ctrl info
             curPos = cmds.xform(ctrl, q=True, ws=True, rp=True)
             curRot = cmds.xform(ctrl, q=True, ws=True, ro=True)
-            valT = cmds.getAttr(ctrl + '.translate')[0]
-            valR = cmds.getAttr(ctrl + '.rotate')[0]
+            valT = cmds.getAttr(ctrl + ".translate")[0]
+            valR = cmds.getAttr(ctrl + ".rotate")[0]
 
             # key previous frame
             if key and keyPrevious:
-                prevKey = cmds.findKeyframe(ctrl + '.' + spaceAttrName, time=(curFrame, curFrame), which='previous')
+                prevKey = cmds.findKeyframe(
+                    ctrl + "." + spaceAttrName,
+                    time=(curFrame, curFrame),
+                    which="previous",
+                )
                 if prevKey != curFrame - 1:
-                    cmds.setKeyframe(ctrl + '.' + spaceAttrName, time=curFrame - 1, value=curSpace, itt='clamped',
-                                   ott='step')
-                for i, attr in enumerate(['tx', 'ty', 'tz']):
-                    cmds.setKeyframe(ctrl + '.' + attr, time=curFrame - 1, value=valT[i], itt='clamped', ott='step')
-                for i, attr in enumerate(['rx', 'ry', 'rz']):
-                    cmds.setKeyframe(ctrl + '.' + attr, time=curFrame - 1, value=valR[i], itt='clamped', ott='step')
+                    cmds.setKeyframe(
+                        ctrl + "." + spaceAttrName,
+                        time=curFrame - 1,
+                        value=curSpace,
+                        itt="clamped",
+                        ott="step",
+                    )
+                for i, attr in enumerate(["tx", "ty", "tz"]):
+                    cmds.setKeyframe(
+                        ctrl + "." + attr,
+                        time=curFrame - 1,
+                        value=valT[i],
+                        itt="clamped",
+                        ott="step",
+                    )
+                for i, attr in enumerate(["rx", "ry", "rz"]):
+                    cmds.setKeyframe(
+                        ctrl + "." + attr,
+                        time=curFrame - 1,
+                        value=valR[i],
+                        itt="clamped",
+                        ott="step",
+                    )
 
             # Get current transform of ctrl
             wsPos = cmds.xform(ctrl, query=True, ws=True, t=True)
@@ -168,14 +208,14 @@ def cycleControlSpace(key=True, keyPrevious=True):
 
             # Query the space attr and find the next space to cycle to
             spaceEnum = cmds.attributeQuery(spaceAttrName, listEnum=True, node=ctrl)[0]
-            spaceEnumList = spaceEnum.split(':')
-            currentSpace = cmds.getAttr('%s.%s' % (ctrl, spaceAttrName), asString=True)
+            spaceEnumList = spaceEnum.split(":")
+            currentSpace = cmds.getAttr("%s.%s" % (ctrl, spaceAttrName), asString=True)
             spaceIndex = spaceEnumList.index(currentSpace)
             nextSpaceIndex = spaceIndex + 1
             if nextSpaceIndex > len(spaceEnumList) - 1:
                 nextSpaceIndex = 0
 
-            cmds.setAttr('%s.%s' % (ctrl, spaceAttrName), nextSpaceIndex)
+            cmds.setAttr("%s.%s" % (ctrl, spaceAttrName), nextSpaceIndex)
 
             # Now that we're in the next space, set the transform back to the previous pos/ori
             cmds.xform(ctrl, ws=True, a=True, t=[wsPos[0], wsPos[1], wsPos[2]])
@@ -183,99 +223,115 @@ def cycleControlSpace(key=True, keyPrevious=True):
 
             # key current frame
             if key:
-                for i, attr in enumerate([spaceAttrName, 'tx', 'ty', 'tz', 'rx', 'ry', 'rz']):
-                    cmds.setKeyframe(ctrl + '.' + attr, itt='clamped', ott='step')
+                for i, attr in enumerate(
+                    [spaceAttrName, "tx", "ty", "tz", "rx", "ry", "rz"]
+                ):
+                    cmds.setKeyframe(ctrl + "." + attr, itt="clamped", ott="step")
 
-            LOG.info('Cycled space for %s to %s...' % (ctrl, spaceEnumList[nextSpaceIndex]))
+            log.info(
+                "Cycled space for %s to %s..." % (ctrl, spaceEnumList[nextSpaceIndex])
+            )
 
     else:
-        LOG.error('Nothing selected, a control with a spaces attribute and try again!')
+        log.error("Nothing selected, a control with a spaces attribute and try again!")
 
 
-def create(spaceNode, spaceSwitch=None, parent=None, mode='parent', master_node='Main', verbose=False):
-    '''
+def create(
+    spaceNode,
+    spaceSwitch=None,
+    parent=None,
+    mode="parent",
+    master_node="Main",
+    verbose=False,
+):
+    """
     other modes: 'orient', 'point'
     nodes in the network:
     spaceGrp:        node to group the space targets (usually parented to the noXform_grp) 'Lf_arm_ikh_zeroSpaces'
     spaceSwitch:     node used to mamage switch (usually a control) 'Lf_arm_ikh_ctrl'
     spaceNode:       node that gets constrained to the various space targets (usually a parent of the control node) 'Lf_arm_ikh_zero'
     spaceConstraint: constraint node used to switch spaces 'Lf_arm_ikh_zero_parentConstraint1'
-    '''
+    """
 
     if verbose == True:
-        print('creating space node for %s' %spaceNode)
+        log.info("creating space node for %s" % spaceNode)
 
     if not spaceSwitch:
         spaceSwitch = spaceNode
 
-    if not cmds.objExists(spaceNode+'.spaceGrp'):
-
+    if not cmds.objExists(spaceNode + ".spaceGrp"):
         # Space Group
-        grp = cmds.createNode('transform', n=spaceNode+'Spaces', parent=parent)
-        cmds.setAttr(grp+'.inheritsTransform', False)
-        decomposeMatrix = cmds.createNode('decomposeMatrix')
-        cmds.connectAttr(spaceNode+'.parentMatrix', decomposeMatrix+'.inputMatrix')
-        cmds.connectAttr(decomposeMatrix+'.outputTranslate', grp+'.translate')
-        cmds.connectAttr(decomposeMatrix+'.outputRotate', grp+'.rotate')
-        cmds.connectAttr(decomposeMatrix+'.outputScale', grp+'.scale')
+        grp = cmds.createNode("transform", n=spaceNode + "Spaces", parent=parent)
+        cmds.setAttr(grp + ".inheritsTransform", False)
+        decomposeMatrix = cmds.createNode("decomposeMatrix")
+        cmds.connectAttr(spaceNode + ".parentMatrix", decomposeMatrix + ".inputMatrix")
+        cmds.connectAttr(decomposeMatrix + ".outputTranslate", grp + ".translate")
+        cmds.connectAttr(decomposeMatrix + ".outputRotate", grp + ".rotate")
+        cmds.connectAttr(decomposeMatrix + ".outputScale", grp + ".scale")
 
         # Initial Space = MasterOffset
-        cmds.addAttr(spaceSwitch, ln=SPACEATTR, attributeType='enum', enumName='master', keyable=True)
-        masterSpace = cmds.createNode('transform', name=grp+'_master', parent=grp)
+        cmds.addAttr(
+            spaceSwitch,
+            ln=SPACEATTR,
+            attributeType="enum",
+            enumName="master",
+            keyable=True,
+        )
+        masterSpace = cmds.createNode("transform", name=grp + "_master", parent=grp)
         matchPose(spaceNode, masterSpace)
 
         if not cmds.objExists(master_node):
             cmds.createNode("transform", name=master_node)
         cmds.parentConstraint(master_node, masterSpace, mo=True)
-        #cmds.parentConstraint("Main", masterSpace, mo=True)
-        lockAndHide(['t','r','s','v'], masterSpace)
+        # cmds.parentConstraint("Main", masterSpace, mo=True)
+        lockAndHide(["t", "r", "s", "v"], masterSpace)
 
         # Space Constraint
-        if mode == 'point':
+        if mode == "point":
             constraint = cmds.pointConstraint(masterSpace, spaceNode, mo=True)[0]
-        if mode == 'orient':
+        if mode == "orient":
             constraint = cmds.orientConstraint(masterSpace, spaceNode, mo=True)[0]
         else:
             constraint = cmds.parentConstraint(masterSpace, spaceNode, mo=True)[0]
 
         # Message Attrs (for tracing network)
-        cmds.addAttr(spaceNode, ln='spaceGrp', at='message', keyable=True)
-        cmds.connectAttr(grp+'.message', spaceNode+'.spaceGrp')
+        cmds.addAttr(spaceNode, ln="spaceGrp", at="message", keyable=True)
+        cmds.connectAttr(grp + ".message", spaceNode + ".spaceGrp")
 
-        cmds.addAttr(spaceSwitch, ln='spaceNode', at='message', keyable=True)
-        cmds.connectAttr(spaceNode+'.message', spaceSwitch+'.spaceNode')
+        cmds.addAttr(spaceSwitch, ln="spaceNode", at="message", keyable=True)
+        cmds.connectAttr(spaceNode + ".message", spaceSwitch + ".spaceNode")
 
-        cmds.addAttr(spaceNode, ln='spaceConstraint', at='message', keyable=True)
-        cmds.connectAttr(constraint+'.message', spaceNode+'.spaceConstraint')
+        cmds.addAttr(spaceNode, ln="spaceConstraint", at="message", keyable=True)
+        cmds.connectAttr(constraint + ".message", spaceNode + ".spaceConstraint")
 
-        cmds.addAttr(spaceNode, ln='spaceSwitch', at='message', keyable=True)
-        cmds.connectAttr(spaceSwitch+'.'+SPACEATTR, spaceNode+'.spaceSwitch')
+        cmds.addAttr(spaceNode, ln="spaceSwitch", at="message", keyable=True)
+        cmds.connectAttr(spaceSwitch + "." + SPACEATTR, spaceNode + ".spaceSwitch")
 
-        return(spaceNode)
+        return spaceNode
 
     else:
-
-        print 'spaces.create: '+spaceNode +'already exists. Use spaces.add'
+        log.info("spaces.create: " + spaceNode + "already exists. Use spaces.add")
         return None
 
-def matchPose(src, dst, poseType='pose'):
-    '''
-    Match dst transform to src transform (follows maya constraint argument order: src, dst)
-    '''
 
-    if(poseType == 'position'):
+def matchPose(src, dst, poseType="pose"):
+    """
+    Match dst transform to src transform (follows maya constraint argument order: src, dst)
+    """
+
+    if poseType == "position":
         position = cmds.xform(src, query=True, worldSpace=True, rotatePivot=True)
         cmds.xform(dst, worldSpace=True, translation=position)
 
-    elif(poseType == 'rotation'):
+    elif poseType == "rotation":
         rotation = cmds.xform(src, query=True, worldSpace=True, rotation=True)
         cmds.xform(dst, worldSpace=True, rotation=rotation)
 
-    elif(poseType == 'scale'):
+    elif poseType == "scale":
         scale = cmds.xform(src, query=True, worldSpace=True, scale=True)
         cmds.xform(dst, worldSpace=True, scale=scale)
 
-    elif(poseType == 'pose'):
+    elif poseType == "pose":
         pivot = cmds.xform(src, query=True, worldSpace=True, rotatePivot=True)
         matrix = cmds.xform(src, query=True, worldSpace=True, matrix=True)
         matrix[12] = pivot[0]
@@ -285,69 +341,80 @@ def matchPose(src, dst, poseType='pose'):
 
 
 def getNodes(spaceNode):
-    '''
-    '''
+    """ """
 
     if not cmds.objExists(spaceNode):
-        print 'spaces.getNodes: '+spaceNode+' does not exist, please create use spaces.create'
+        log.info(
+            "spaces.getNodes: "
+            + spaceNode
+            + " does not exist, please create use spaces.create"
+        )
         return None
 
-    if cmds.objExists(spaceNode+'.spaceGrp') and cmds.objExists(spaceNode+'.spaceSwitch') and cmds.objExists(spaceNode+'.spaceConstraint'):
-        spaceGrp        = cmds.listConnections(spaceNode+'.spaceGrp')[0]
-        spaceSwitch   = cmds.listConnections(spaceNode+'.spaceSwitch')[0]
-        spaceConstraint = cmds.listConnections(spaceNode+'.spaceConstraint')[0]
+    if (
+        cmds.objExists(spaceNode + ".spaceGrp")
+        and cmds.objExists(spaceNode + ".spaceSwitch")
+        and cmds.objExists(spaceNode + ".spaceConstraint")
+    ):
+        spaceGrp = cmds.listConnections(spaceNode + ".spaceGrp")[0]
+        spaceSwitch = cmds.listConnections(spaceNode + ".spaceSwitch")[0]
+        spaceConstraint = cmds.listConnections(spaceNode + ".spaceConstraint")[0]
 
         return spaceGrp, spaceSwitch, spaceConstraint
 
     else:
-
-        print 'spaces.getNodes: no space attrs exist on '+spaceNode+', please create use spaces.create'
+        log.info(
+            "spaces.getNodes: no space attrs exist on "
+            + spaceNode
+            + ", please create use spaces.create"
+        )
         return None
+
 
 def getSpaceNode(ctrl):
-
-    if cmds.objExists(ctrl+'.spaceNode'):
-        spaceNode = cmds.listConnections(ctrl+'.spaceNode')[0]
+    if cmds.objExists(ctrl + ".spaceNode"):
+        spaceNode = cmds.listConnections(ctrl + ".spaceNode")[0]
         return spaceNode
     else:
-        cmds.warning('spaces.getSpaceNode: could not find spaceNetwork for '+ctrl)
+        cmds.warning("spaces.getSpaceNode: could not find spaceNetwork for " + ctrl)
         return None
 
+
 def connect(constraint, spaceSwitch):
-    '''
-    '''
+    """ """
 
     # get info from constraint
     conType = cmds.objectType(constraint)
-    if conType == 'pointConstraint':
-        aliasList  = cmds.pointConstraint(constraint, q=True, weightAliasList=True)
+    if conType == "pointConstraint":
+        aliasList = cmds.pointConstraint(constraint, q=True, weightAliasList=True)
         targetList = cmds.pointConstraint(constraint, q=True, targetList=True)
-    if conType == 'orientConstraint':
-        aliasList  = cmds.orientConstraint(constraint, q=True, weightAliasList=True)
+    if conType == "orientConstraint":
+        aliasList = cmds.orientConstraint(constraint, q=True, weightAliasList=True)
         targetList = cmds.orientConstraint(constraint, q=True, targetList=True)
     else:
-        aliasList  = cmds.parentConstraint(constraint, q=True, weightAliasList=True)
+        aliasList = cmds.parentConstraint(constraint, q=True, weightAliasList=True)
         targetList = cmds.parentConstraint(constraint, q=True, targetList=True)
 
     for i in range(len(aliasList)):
-
         # Create conditionNode to map constraint weights
-        condNode = targetList[i]+'_condition'
+        condNode = targetList[i] + "_condition"
         if cmds.objExists(condNode):
             # recreate if it exists
             cmds.delete(condNode)
-        cmds.createNode('condition', n=condNode)
+        cmds.createNode("condition", n=condNode)
 
-        cmds.setAttr(condNode+'.operation', 0)
-        cmds.setAttr(condNode+'.secondTerm', i)
-        cmds.connectAttr(spaceSwitch+'.'+SPACEATTR, condNode+'.firstTerm', f=True)
-        cmds.setAttr(condNode+'.colorIfTrueR', 1)
-        cmds.setAttr(condNode+'.colorIfFalseR', 0)
-        cmds.connectAttr(condNode+'.outColorR', constraint+'.'+aliasList[i], f=True)
+        cmds.setAttr(condNode + ".operation", 0)
+        cmds.setAttr(condNode + ".secondTerm", i)
+        cmds.connectAttr(spaceSwitch + "." + SPACEATTR, condNode + ".firstTerm", f=True)
+        cmds.setAttr(condNode + ".colorIfTrueR", 1)
+        cmds.setAttr(condNode + ".colorIfFalseR", 0)
+        cmds.connectAttr(
+            condNode + ".outColorR", constraint + "." + aliasList[i], f=True
+        )
 
-def add(spaceNode, target, name=None, mode='parent'):
-    '''
-    '''
+
+def add(spaceNode, target, name=None, mode="parent"):
+    """ """
 
     if not name:
         space = target
@@ -360,29 +427,43 @@ def add(spaceNode, target, name=None, mode='parent'):
     # See if mode is compatible
     conType = cmds.objectType(spaceConstraint)
     if not conType.__contains__(mode):
-        cmds.warning('spaces.add: cannot add '+mode+'Constraint target to a '+conType)
+        cmds.warning(
+            "spaces.add: cannot add " + mode + "Constraint target to a " + conType
+        )
         return None
 
     # Check current spaces
-    curSpaces = cmds.attributeQuery(SPACEATTR, node=spaceSwitch, listEnum=True)[0].split(':')
+    curSpaces = cmds.attributeQuery(SPACEATTR, node=spaceSwitch, listEnum=True)[
+        0
+    ].split(":")
     if space in curSpaces or target in curSpaces:
-        print 'spaces.add: "'+spaceSwitch+'" already has a "'+space+'" space, skipping...'
+        log.info(
+            'spaces.add: "'
+            + spaceSwitch
+            + '" already has a "'
+            + space
+            + '" space, skipping...'
+        )
         return None
 
     # Add enum space
-    cmds.addAttr(spaceSwitch+'.'+SPACEATTR, e=True, enumName=':'.join(curSpaces+[space]))
+    cmds.addAttr(
+        spaceSwitch + "." + SPACEATTR, e=True, enumName=":".join(curSpaces + [space])
+    )
 
     # Add spaceTarget in space of target object
-    spaceTarget = cmds.createNode('transform', name=spaceGrp+'_'+space, parent=spaceGrp)
+    spaceTarget = cmds.createNode(
+        "transform", name=spaceGrp + "_" + space, parent=spaceGrp
+    )
     matchPose(spaceNode, spaceTarget)
 
     cmds.parentConstraint(target, spaceTarget, mo=True)
-    lockAndHide(['t','r','s','v'], spaceTarget)
+    lockAndHide(["t", "r", "s", "v"], spaceTarget)
 
     # Add target to spaceNode constraint
-    if mode == 'orient':
+    if mode == "orient":
         spaceConstraint = cmds.orientConstraint(spaceTarget, spaceNode, mo=True)[0]
-    elif mode == 'point':
+    elif mode == "point":
         spaceConstraint = cmds.pointConstraint(spaceTarget, spaceNode, mo=True)[0]
     else:
         spaceConstraint = cmds.parentConstraint(spaceTarget, spaceNode, mo=True)[0]
@@ -390,11 +471,11 @@ def add(spaceNode, target, name=None, mode='parent'):
     # Update weight connections
     connect(spaceConstraint, spaceSwitch)
 
-    return(spaceTarget)
+    return spaceTarget
+
 
 def remove(spaceNode, space):
-    '''
-    '''
+    """ """
 
     # Get space node network
     spaceGrp, spaceSwitch, spaceConstraint = getNodes(spaceNode)
@@ -403,35 +484,48 @@ def remove(spaceNode, space):
     spaceInt = space
     if isinstance(space, basestring):
         enumNames = cmds.attributeQuery(SPACEATTR, node=spaceSwitch, listEnum=True)[0]
-        enumNameList = enumNames.split(':')
+        enumNameList = enumNames.split(":")
         if space in enumNameList:
             spaceInt = enumNameList.index(space)
     if not isinstance(space, int):
-        print 'spaces.remove: "'+space+'" does not appear to belong to "'+spaceNode+'", skipping...'
+        log.info(
+            'spaces.remove: "'
+            + space
+            + '" does not appear to belong to "'
+            + spaceNode
+            + '", skipping...'
+        )
         return
 
     # Get currently set space and current space names
-    curSpace = cmds.getAttr(spaceSwitch+'.'+SPACEATTR)
-    curSpaces = cmds.attributeQuery(SPACEATTR, node=spaceSwitch, listEnum=True)[0].split(':')
-    if spaceInt >= len(curSpaces) :
-        print 'spaces.remove: "'+space+'" does not have a space at this index '+str(spaceInt)
+    curSpace = cmds.getAttr(spaceSwitch + "." + SPACEATTR)
+    curSpaces = cmds.attributeQuery(SPACEATTR, node=spaceSwitch, listEnum=True)[
+        0
+    ].split(":")
+    if spaceInt >= len(curSpaces):
+        log.info(
+            'spaces.remove: "'
+            + space
+            + '" does not have a space at this index '
+            + str(spaceInt)
+        )
         return
-    newSpaces = [curSpaces[i] for i in range(len(curSpaces)) if i!=space]
+    newSpaces = [curSpaces[i] for i in range(len(curSpaces)) if i != space]
 
     # Update enum attr
-    cmds.addAttr(spaceSwitch+'.'+SPACEATTR, e=True, enumName=':'.join(newSpaces))
+    cmds.addAttr(spaceSwitch + "." + SPACEATTR, e=True, enumName=":".join(newSpaces))
 
     # Delete dead spaceTarget node
-    spaceTargets = cmds.listRelatives(spaceGrp, c=True, type='transform')
+    spaceTargets = cmds.listRelatives(spaceGrp, c=True, type="transform")
     cmds.delete(spaceTargets[spaceInt])
 
     # Delete entire network if only one space
-    if len(curSpaces)==1:
-        cmds.deleteAttr(spaceSwitch+'.'+SPACEATTR)
-        cmds.deleteAttr(spaceSwitch+'.spaceSwitch')
-        cmds.deleteAttr(spaceSwitch+'.spaceNode')
-        cmds.deleteAttr(spaceSwitch+'.spaceGrp')
-        cmds.deleteAttr(spaceSwitch+'.spaceConstraint')
+    if len(curSpaces) == 1:
+        cmds.deleteAttr(spaceSwitch + "." + SPACEATTR)
+        cmds.deleteAttr(spaceSwitch + ".spaceSwitch")
+        cmds.deleteAttr(spaceSwitch + ".spaceNode")
+        cmds.deleteAttr(spaceSwitch + ".spaceGrp")
+        cmds.deleteAttr(spaceSwitch + ".spaceConstraint")
         cmds.delete(spaceGrp)
         return
 
@@ -441,12 +535,12 @@ def remove(spaceNode, space):
     if space == curSpace:
         cmds.dgdirty(a=True)
 
-    return(spaceTarget)
+    return spaceTarget
+
 
 def snapAndKey(ctrl, space, key=True, keyPrevious=True):
-
     if isinstance(space, basestring):
-        space = attribute.getEnumIndex(ctrl+'.'+SPACEATTR, space)
+        space = attribute.getEnumIndex(ctrl + "." + SPACEATTR, space)
 
     spaceNode = getSpaceNode(ctrl)
 
@@ -454,42 +548,66 @@ def snapAndKey(ctrl, space, key=True, keyPrevious=True):
     spaceGrp, spaceSwitch, spaceConstraint = getNodes(spaceNode)
 
     curFrame = cmds.currentTime(q=True)
-    curSpace = cmds.getAttr(spaceSwitch+'.'+SPACEATTR)
+    curSpace = cmds.getAttr(spaceSwitch + "." + SPACEATTR)
 
     # Get current space ctrl info
-    curPos   = cmds.xform(spaceSwitch, q=True, ws=True, rp=True)
-    curRot   = cmds.xform(spaceSwitch, q=True, ws=True, ro=True)
-    valT = cmds.getAttr(spaceSwitch+'.translate')[0]
-    valR = cmds.getAttr(spaceSwitch+'.rotate')[0]
+    curPos = cmds.xform(spaceSwitch, q=True, ws=True, rp=True)
+    curRot = cmds.xform(spaceSwitch, q=True, ws=True, ro=True)
+    valT = cmds.getAttr(spaceSwitch + ".translate")[0]
+    valR = cmds.getAttr(spaceSwitch + ".rotate")[0]
 
     # key previous frame
-    keyMsg = ''
+    keyMsg = ""
     if key and keyPrevious:
-        prevKey = cmds.findKeyframe(spaceSwitch+'.'+SPACEATTR, time=(curFrame, curFrame), which='previous')
-        if prevKey != curFrame-1:
-            cmds.setKeyframe(spaceSwitch+'.'+SPACEATTR, time=curFrame-1, value=curSpace, itt='clamped', ott='step')
-        for i, attr in enumerate(['tx', 'ty', 'tz']):
-            cmds.setKeyframe(spaceSwitch+'.'+attr,  time=curFrame-1, value=valT[i],  itt='clamped', ott='step')
-        for i, attr in enumerate(['rx', 'ry', 'rz']):
-            cmds.setKeyframe(spaceSwitch+'.'+attr,  time=curFrame-1, value=valR[i],  itt='clamped', ott='step')
+        prevKey = cmds.findKeyframe(
+            spaceSwitch + "." + SPACEATTR, time=(curFrame, curFrame), which="previous"
+        )
+        if prevKey != curFrame - 1:
+            cmds.setKeyframe(
+                spaceSwitch + "." + SPACEATTR,
+                time=curFrame - 1,
+                value=curSpace,
+                itt="clamped",
+                ott="step",
+            )
+        for i, attr in enumerate(["tx", "ty", "tz"]):
+            cmds.setKeyframe(
+                spaceSwitch + "." + attr,
+                time=curFrame - 1,
+                value=valT[i],
+                itt="clamped",
+                ott="step",
+            )
+        for i, attr in enumerate(["rx", "ry", "rz"]):
+            cmds.setKeyframe(
+                spaceSwitch + "." + attr,
+                time=curFrame - 1,
+                value=valR[i],
+                itt="clamped",
+                ott="step",
+            )
 
     # switch to new space
-    cmds.setAttr(spaceSwitch+'.'+SPACEATTR, space)
+    cmds.setAttr(spaceSwitch + "." + SPACEATTR, space)
     cmds.xform(spaceSwitch, ws=True, t=curPos)
     cmds.xform(spaceSwitch, ws=True, ro=curRot)
 
     # key current frame
     if key:
-        keyMsg = ' & key'
-        for i, attr in enumerate([SPACEATTR, 'tx', 'ty', 'tz', 'rx', 'ry', 'rz']):
-            cmds.setKeyframe(spaceSwitch+'.'+attr, itt='clamped', ott='step')
+        keyMsg = " & key"
+        for i, attr in enumerate([SPACEATTR, "tx", "ty", "tz", "rx", "ry", "rz"]):
+            cmds.setKeyframe(spaceSwitch + "." + attr, itt="clamped", ott="step")
 
-    # print message
-    msg = 'spaces: snap'+keyMsg+': '
-    oldSpace = cmds.attributeQuery(SPACEATTR, node=spaceSwitch, listEnum=True)[0].split(':')[curSpace]
-    newSpace = cmds.attributeQuery(SPACEATTR, node=spaceSwitch, listEnum=True)[0].split(':')[space]
-    msg += oldSpace+' -> '+newSpace
-    print msg
+    # log.info message
+    msg = "spaces: snap" + keyMsg + ": "
+    oldSpace = cmds.attributeQuery(SPACEATTR, node=spaceSwitch, listEnum=True)[0].split(
+        ":"
+    )[curSpace]
+    newSpace = cmds.attributeQuery(SPACEATTR, node=spaceSwitch, listEnum=True)[0].split(
+        ":"
+    )[space]
+    msg += oldSpace + " -> " + newSpace
+    log.info(msg)
 
 
 def lockAndHide(attrPath, node=None):
@@ -588,17 +706,17 @@ def getAttrPaths(attrPath, node=None, recursive=False):
 
         attrPathList = list(set(attrPathList + relAttrPathList))
 
-    return(attrPathList)
+    return attrPathList
 
 
 def toList(input):
     """
     takes input and returns it as a list
     """
-    if isinstance( input, list ):
+    if isinstance(input, list):
         return input
 
-    elif isinstance( input, tuple ):
+    elif isinstance(input, tuple):
         return list(input)
 
     return [input]
@@ -626,23 +744,22 @@ def getAttrRelatives(attrPath):
 
     # Find any parent or children to the list
     if cmds.objExists(attrPath):
-        nodeName = attrPath.partition('.')[0]
-        attrName = attrPath.partition('.')[-1]
+        nodeName = attrPath.partition(".")[0]
+        attrName = attrPath.partition(".")[-1]
 
         # Get attribute parent
         attrParent = cmds.attributeQuery(attrName, node=nodeName, listParent=True)
         if attrParent:
             for attr in attrParent:
-                attrPathList.append(nodeName+'.'+attr)
+                attrPathList.append(nodeName + "." + attr)
 
         # Get attribute children
         attrChildren = cmds.attributeQuery(attrName, node=nodeName, listChildren=True)
         if attrChildren:
             for attr in attrChildren:
-                attrPathList.append(nodeName+'.'+attr)
+                attrPathList.append(nodeName + "." + attr)
     else:
-
-        print('attribute.getAttrPaths: '+attrPath+' does NOT exist, skipping...')
+        log.info("attribute.getAttrPaths: " + attrPath + " does NOT exist, skipping...")
 
     return attrPathList
 
@@ -673,5 +790,4 @@ def createAttrPaths(attrs, nodes):
             attrPath = "%s.%s" % (node, attr)
             attrPathList.append(attrPath)
 
-    return(attrPathList)
-
+    return attrPathList

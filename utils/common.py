@@ -1,7 +1,3 @@
-
-
-
-
-GRP = '_grp'
-PLV = '_plv'
-CTL = '_ctl'
+GRP = "_grp"
+PLV = "_plv"
+CTL = "_ctl"
