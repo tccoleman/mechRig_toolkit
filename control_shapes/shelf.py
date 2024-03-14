@@ -84,7 +84,6 @@ def load():
                 )
 
                 for each in ctl_func.get_available_control_shapes():
-                    print(each)
                     cmds.menuItem(p=sub, l=each[0], command=each[1])
 
                 cmds.menuItem(
