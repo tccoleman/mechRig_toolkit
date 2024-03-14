@@ -26,10 +26,11 @@ def get_available_control_shapes():
     :return:
     """
     lib = core.SHAPE_LIBRARY_PATH
-    return [
+    shapes = [
         (x.split(".")[0], functools.partial(assign_control_shape, x.split(".")[0]))
         for x in os.listdir(lib)
     ]
+    return shapes
 
 
 def assign_color(*args):
@@ -151,3 +152,7 @@ def delete_shapes():
         if shps:
             cmds.delete(shps)
     return
+
+
+if __name__ == "__main__":
+    shapes = get_available_control_shapes()

@@ -24,9 +24,7 @@ import subprocess
 import sys
 
 from maya import cmds
-import maya
 
-from mechRig_toolkit.utils import locator
 
 from mechRig_toolkit.control_shapes import color as ctl_color
 from mechRig_toolkit.control_shapes import core as ctl_core
@@ -59,7 +57,7 @@ def reload_shelf(shelf_name=SHELF_NAME):
     try:
         from imp import reload
         from mechRig_toolkit.shelves import shelf_mechRig_utils
-        import shelf_base
+        from mechRig_toolkit.shelves import shelf_base
 
         reload(shelf_mechRig_utils)
         reload(shelf_base)
@@ -68,7 +66,7 @@ def reload_shelf(shelf_name=SHELF_NAME):
         log.info("Successfully reloaded {} shelf".format(SHELF_NAME))
         return True
     except:
-        log.error("Error reloading shelf")
+        log.exception("Error reloading shelf")
         return
 
 

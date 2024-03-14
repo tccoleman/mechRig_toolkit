@@ -16,7 +16,8 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
-SHAPE_LIBRARY_PATH = os.path.abspath("{}\\shapes".format(CURRENT_DIRECTORY))
+SHAPE_LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, "shapes")
+print(SHAPE_LIBRARY_PATH)
 
 
 def get_shape(crv=None):
