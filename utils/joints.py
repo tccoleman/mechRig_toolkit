@@ -11,11 +11,11 @@ Various functions for creating and editing joints and their axis.
 
 import logging
 
-logging.basicConfig()
-LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.INFO)
-
 from maya import cmds
+
+logging.basicConfig()
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
 
 
 def orientJoint(joints, aimAxis, upAxis, worldUpAxis):
@@ -36,9 +36,8 @@ def orientJoint(joints, aimAxis, upAxis, worldUpAxis):
         Logs warning if operator input is NOT +-.
     """
     for i in xrange(len(joints)):
-
         # Find unparent children
-        children = cmds.listRelatives(joints[i], children=1, pa=1, type='transform')
+        children = cmds.listRelatives(joints[i], children=1, pa=1, type="transform")
         if children and (len(children) > 0):
             # Unparent and get names of the objects(possibly renamed)
             children = cmds.parent(children, w=1)
@@ -49,15 +48,22 @@ def orientJoint(joints, aimAxis, upAxis, worldUpAxis):
             parent = parent[0]
 
         # If joints[i] has a child joint, aim to that
-        aimTarget = ''
+        aimTarget = ""
         if children:
             for child in children:
                 if cmds.objectType(child, isType="joint"):
                     aimTarget = child
                     break
 
-        if aimTarget != '':
-            aCons = cmds.aimConstraint(aimTarget, joints[i], aim=aimAxis, upVector=upAxis, worldUpVector=worldUpAxis, worldUpType='vector')
+        if aimTarget != "":
+            aCons = cmds.aimConstraint(
+                aimTarget,
+                joints[i],
+                aim=aimAxis,
+                upVector=upAxis,
+                worldUpVector=worldUpAxis,
+                worldUpType="vector",
+            )
             cmds.delete(aCons)
 
         elif parent:
@@ -86,16 +92,16 @@ def orientTo():
     """
     sel = cmds.ls(sl=1)
     if len(sel) < 2:
-        LOG.warning('Please select one source joint and one or more target joints.')
+        log.warning("Please select one source joint and one or more target joints.")
         return
 
     for jnt in sel:
         if not cmds.objectType(jnt, isType="joint"):
-            LOG.warning('Please select joints only.')
+            log.warning("Please select joints only.")
 
     for i in xrange(1, len(sel)):
         # Find unparent children
-        children = cmds.listRelatives(sel[i], children=1, type='transform')
+        children = cmds.listRelatives(sel[i], children=1, type="transform")
         if children and (len(children) > 0):
             # Unparent and get names of the objects(possibly renamed)
             children = cmds.parent(children, w=1)
@@ -125,12 +131,12 @@ def planarOrient(joints, aimAxis, upAxis):
         Logs warning if joints contain non-joint type.
     """
     if len(joints) != 3:
-        LOG.warning('Please select 3 joints.')
+        log.warning("Please select 3 joints.")
         return
 
     for jnt in joints:
         if not cmds.objectType(jnt, isType="joint"):
-            LOG.warning('Please select joints only.')
+            log.warning("Please select joints only.")
 
     jnt1 = cmds.xform(joints[0], ws=1, t=1, q=1)
     jnt2 = cmds.xform(joints[1], ws=1, t=1, q=1)
@@ -154,23 +160,27 @@ def cross(a, b):
     Returns: Cross product of a and b.
 
     """
-    c = [a[1]*b[2] - a[2]*b[1],
-         a[2]*b[0] - a[0]*b[2],
-         a[0]*b[1] - a[1]*b[0]]
+    c = [
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0],
+    ]
 
     return c
 
 
-def duplicate_joint_chain(source_joint, search='_jnt', replace='_ik'):
+def duplicate_joint_chain(source_joint, search="_jnt", replace="_ik"):
     """Duplicates full skeleton chain from source_joint
 
     duplicate_joint_chain('rt_frontShoulder_jnt', search='_jnt', replace='_ik')
     """
-    dupe_chain = cmds.duplicate(source_joint, name=source_joint.replace(search, replace))
+    dupe_chain = cmds.duplicate(
+        source_joint, name=source_joint.replace(search, replace)
+    )
     dupe_child = cmds.listRelatives(dupe_chain[0], ad=True, f=True)
     dupe_child.sort(reverse=True)
     for jnt in dupe_child:
-        cmds.rename(jnt, jnt.split('|')[-1].replace(search, replace))
+        cmds.rename(jnt, jnt.split("|")[-1].replace(search, replace))
 
     # Re-list new joint chain to return cleaner list of the new joints
     new_chain = cmds.listRelatives(dupe_chain[0], ad=True)

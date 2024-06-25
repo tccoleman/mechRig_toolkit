@@ -1,2 +1,1 @@
-import build
-reload(build)
+from mechRig_toolkit.builds.Cambot_rig import build

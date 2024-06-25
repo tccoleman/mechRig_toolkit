@@ -10,7 +10,7 @@ def _null(*args):
     pass
 
 
-class _shelf():
+class _shelf:
     """A simple class to build shelves in maya. Since the build method is empty,
     it should be extended by the derived class to build the necessary shelf elements.
     By default it creates an empty shelf called "customShelf"."""
@@ -21,7 +21,7 @@ class _shelf():
         self.iconPath = iconPath
 
         self.labelBackground = (0, 0, 0, 0)
-        self.labelColour = (.9, .9, .9)
+        self.labelColour = (0.9, 0.9, 0.9)
 
         self._cleanOldShelf()
         cmds.setParent(self.name)
@@ -32,13 +32,31 @@ class _shelf():
         elements. Otherwise, nothing is added to the shelf."""
         pass
 
-    def addButton(self, label, icon="commandButton.png", ann="", command=_null, doubleCommand=_null, overlayLabelColor=(.9, .9, .9)):
+    def addButton(
+        self,
+        label,
+        icon="commandButton.png",
+        ann="",
+        command=_null,
+        doubleCommand=_null,
+        overlayLabelColor=(0.9, 0.9, 0.9),
+    ):
         """Adds a shelf button with the specified label, command, double click command and image."""
         cmds.setParent(self.name)
         if icon:
             icon = self.iconPath + icon
-        cmds.shelfButton(width=37, height=37, ann=ann, image=icon, l=label, command=command, dcc=doubleCommand,
-                         imageOverlayLabel=label, olb=self.labelBackground, olc=self.labelColour)
+        cmds.shelfButton(
+            width=37,
+            height=37,
+            ann=ann,
+            image=icon,
+            l=label,
+            command=command,
+            dcc=doubleCommand,
+            imageOverlayLabel=label,
+            olb=self.labelBackground,
+            olc=self.labelColour,
+        )
 
     def addMenuItem(self, parent, label, command=_null, icon=""):
         """Adds a shelf button with the specified label, command, double click command and image."""
